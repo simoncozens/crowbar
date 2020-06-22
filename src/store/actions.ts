@@ -13,7 +13,9 @@ export const changedFontAction = (content:number) => ({
 })
 
 export interface CrowbarFont {
-	name:string;
+	name:   string;
+  base64: string;
+  fontFace: string;
 }
 
 export const _addedFontAction = (font:CrowbarFont) => ({
@@ -22,15 +24,28 @@ export const _addedFontAction = (font:CrowbarFont) => ({
 })
 
 export function addedFontAction (fontFile: File) {
-   return function (dispatch) {
+   return function (dispatch :any) {
      new Promise((resolve, reject) => {
         var fr = new FileReader();
         fr.onload = () => {
           resolve(fr.result )
         };
-        fr.readAsArrayBuffer(file);
-      }).then( (data) => {
+        fr.readAsDataURL(fontFile);
+      }).then( (d1) => {
+        var data = d1 as string;
         console.log(data)
+        var dataURL = data.split("base64");
+        if (dataURL[0].indexOf("application/octet-stream") === -1) {
+            dataURL[0] = "data:application/octet-stream;base64"
+            data = dataURL[0] + dataURL[1];
+        }
+        var fontFace = "@font-face{font-family: " + fontFile.name + "; src:url(" + data + ");}";
+
+        dispatch(_addedFontAction( {
+          name: fontFile.name,
+          base64: data,
+          fontFace: fontFace
+        }));
         // opentype.load('fonts/Roboto-Black.ttf', function(err, font) {
       // }).then( (ot) => {
       // dispatch(_addedFontAction({ ... }))
@@ -47,9 +62,9 @@ export interface CrowbarState {
 export const initialState: CrowbarState = {
   selected_font: 0,
   fonts: [
-  	{name: "Roboto"},
-  	{name: "Arial"},
-  	{name: "Times"}
+  	{name: "Roboto", fontFace: "", base64: ""},
+  	{name: "Arial", fontFace: "", base64: ""},
+  	{name: "Times", fontFace: "", base64: ""}
   ],
   inputtext: ""
 }
