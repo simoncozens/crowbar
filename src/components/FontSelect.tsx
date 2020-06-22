@@ -5,13 +5,19 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { fade,makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { connect, ConnectedProps } from 'react-redux'
-import { changedFontAction } from "../store/actions";
+import { changedFontAction, CrowbarState, CrowbarFont } from "../store/actions";
 
-const connector = connect(null, {changedFontAction})
+const mapStateToProps = (state:CrowbarState) => {
+  const fonts: CrowbarFont[] = state.fonts;
+  return { fonts };
+};
+
+const connector = connect(mapStateToProps, {changedFontAction})
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const FontSelect = (props: PropsFromRedux) => {
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    console.log(event.target)
     props.changedFontAction(event.target.value as number);
   };
   const useStyles = makeStyles((theme: Theme) =>
@@ -38,9 +44,9 @@ const FontSelect = (props: PropsFromRedux) => {
           id="font-select"
           onChange={handleChange}
         >
-          <MenuItem value={0}>Roboto</MenuItem>
-          <MenuItem value={1}>Arial</MenuItem>
-          <MenuItem value={2}>Times</MenuItem>
+            {props.fonts.map( (font:CrowbarFont,ix) => (
+              <MenuItem value={ix}>{font.name}</MenuItem>
+            ))}
         </Select>
       </FormControl>
     </div>

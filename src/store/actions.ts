@@ -39,7 +39,7 @@ export function addedFontAction (fontFile: File) {
             dataURL[0] = "data:application/octet-stream;base64"
             data = dataURL[0] + dataURL[1];
         }
-        var fontFace = "@font-face{font-family: " + fontFile.name + "; src:url(" + data + ");}";
+        var fontFace = "@font-face{font-family:\"" + fontFile.name + "\"; src:url(" + data + ");}";
 
         dispatch(_addedFontAction( {
           name: fontFile.name,

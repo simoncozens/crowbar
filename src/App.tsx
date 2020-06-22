@@ -7,39 +7,21 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 import NavBar from './components/NavBar'
 import BigTextBox from './components/BigTextBox'
+import { connect, ConnectedProps } from 'react-redux'
+import { changedFontAction, CrowbarState, CrowbarFont } from "./store/actions";
+
+const mapStateToProps = (state:CrowbarState) => {
+  return { fontFaces: state.fonts.map( (x) => x.fontFace ) };
+};
+
+const connector = connect(mapStateToProps, {changedFontAction})
+type PropsFromRedux = ConnectedProps<typeof connector>
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-  },
-  appBar: {
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: drawerWidth,
-  },
-  title: {
-    flexGrow: 1,
-  },
-  hide: {
-    display: 'none',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
   },
   drawerHeader: {
     display: 'flex',
@@ -58,15 +40,8 @@ const useStyles = makeStyles((theme) => ({
     }),
     marginRight: -drawerWidth,
   },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: 0,
-  },
 }));
-function App() {
+const App = (props: PropsFromRedux) => {
   const classes = useStyles();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -88,6 +63,9 @@ function App() {
 
   return (
    <ThemeProvider theme={theme}>
+   <style>
+            {props.fontFaces.join("\n")}
+   </style>
     <div className={classes.root}>
       <CssBaseline/>
       <main className={classes.content}>
@@ -98,6 +76,6 @@ function App() {
       </div>
    </ThemeProvider>
   );
-}
+};
 
-export default App;
+export default connector(App);

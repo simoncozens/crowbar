@@ -23,7 +23,7 @@ createStyles({
 const BigTextBox = (props: PropsFromRedux) => {
   const classes = useStyles();
   const restyle = {
-    'font-family': props.fontFamily
+    'font-family': '"'+props.fontFamily+'"'
   } as React.CSSProperties;
   const handleChange = (e: any) => {
     let value = e.target.value;
