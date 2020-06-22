@@ -12,7 +12,8 @@ export default function appReducer(state = initialState, action: any) {
       })
     case ADDED_FONT:
       return Object.assign({}, state, {
-        fonts: [...state.fonts, action.added_font]
+        fonts: [...state.fonts, action.added_font],
+        selected_font: state.fonts.length
       })
     default:
       return state

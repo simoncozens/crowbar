@@ -9,7 +9,7 @@ import { changedFontAction, CrowbarState, CrowbarFont } from "../store/actions";
 
 const mapStateToProps = (state:CrowbarState) => {
   const fonts: CrowbarFont[] = state.fonts;
-  return { fonts };
+  return { fonts, selectedFontIndex: state.selected_font };
 };
 
 const connector = connect(mapStateToProps, {changedFontAction})
@@ -17,7 +17,6 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 
 const FontSelect = (props: PropsFromRedux) => {
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    console.log(event.target)
     props.changedFontAction(event.target.value as number);
   };
   const useStyles = makeStyles((theme: Theme) =>
@@ -43,6 +42,7 @@ const FontSelect = (props: PropsFromRedux) => {
           labelId="font-select-label"
           id="font-select"
           onChange={handleChange}
+          value={props.selectedFontIndex}
         >
             {props.fonts.map( (font:CrowbarFont,ix) => (
               <MenuItem value={ix}>{font.name}</MenuItem>
