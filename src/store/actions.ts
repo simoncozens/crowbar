@@ -18,6 +18,7 @@ export interface CrowbarFont {
 	name:   string;
   base64: string;
   fontFace: string;
+  blob?: ArrayBuffer;
   otFont?: Font;
 }
 
@@ -26,6 +27,16 @@ export const _addedFontAction = (font:CrowbarFont) => ({
   added_font: font
 })
 
+function _arrayBufferToBase64( buffer: ArrayBuffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return btoa( binary );
+}
+
 export function addedFontAction (fontFile: File) {
    return function (dispatch :any) {
      new Promise((resolve, reject) => {
@@ -33,23 +44,18 @@ export function addedFontAction (fontFile: File) {
         fr.onload = () => {
           resolve(fr.result )
         };
-        fr.readAsDataURL(fontFile);
-      }).then( (d1) => {
-        var data = d1 as string;
-        console.log(data)
-        var dataURL = data.split("base64");
-        if (dataURL[0].indexOf("application/octet-stream") === -1) {
-            dataURL[0] = "data:application/octet-stream;base64"
-            data = dataURL[0] + dataURL[1];
-        }
+        fr.readAsArrayBuffer(fontFile);
+      }).then( (result) => {
+        var ab = result as ArrayBuffer;
+        var data = "data:application/octet-stream;base64,"+_arrayBufferToBase64(ab);
         var fontFace = "@font-face{font-family:\"" + fontFile.name + "\"; src:url(" + data + ");}";
 
         load(data, function(err, font) {
-          console.log(err)
           dispatch(_addedFontAction( {
             name: fontFile.name,
             base64: data,
             fontFace: fontFace,
+            blob: ab,
             otFont: font
           }));
         });
