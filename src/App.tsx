@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 // import clsx from 'clsx';
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -8,13 +8,17 @@ import './App.css';
 import NavBar from './components/NavBar'
 import BigTextBox from './components/BigTextBox'
 import { connect, ConnectedProps } from 'react-redux'
-import { changedFontAction, CrowbarState, CrowbarFont } from "./store/actions";
+import { CrowbarState, CrowbarFont } from "./store/actions";
+import hbjs from './hbjs';
+
+declare var window: any;
 
 const mapStateToProps = (state:CrowbarState) => {
-  return { fontFaces: state.fonts.map( (x) => x.fontFace ) };
+  return { fontFaces: state.fonts.map( (x) => x.fontFace ),
+           };
 };
 
-const connector = connect(mapStateToProps, {changedFontAction})
+const connector = connect(mapStateToProps, {})
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const drawerWidth = 240;
@@ -22,6 +26,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+    alignContent: 'center'
   },
   drawerHeader: {
     display: 'flex',
@@ -54,6 +59,16 @@ const App = (props: PropsFromRedux) => {
       }),
     [prefersDarkMode],
   );
+  useEffect( () => {
+      fetch('/harfbuzz.wasm').then(response =>
+        response.arrayBuffer()
+      ).then(bytes =>
+        WebAssembly.instantiate(bytes)
+      ).then(results => {
+        var hb = hbjs(results.instance); // Dirty but works
+        window["hbjs"] = hb;
+      })
+  })
 
   // XXX subscribe to drawer state and set attribute on main
       //   className={clsx(classes.content, {
