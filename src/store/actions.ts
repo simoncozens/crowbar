@@ -1,3 +1,5 @@
+import { Font, load } from 'opentype.js';
+
 export const ADDED_FONT = 'ADDED_FONT'
 export const CHANGED_TEXT = 'CHANGED_TEXT'
 export const CHANGED_FONT = 'CHANGED_FONT'
@@ -16,6 +18,7 @@ export interface CrowbarFont {
 	name:   string;
   base64: string;
   fontFace: string;
+  otFont?: Font;
 }
 
 export const _addedFontAction = (font:CrowbarFont) => ({
@@ -41,14 +44,16 @@ export function addedFontAction (fontFile: File) {
         }
         var fontFace = "@font-face{font-family:\"" + fontFile.name + "\"; src:url(" + data + ");}";
 
-        dispatch(_addedFontAction( {
-          name: fontFile.name,
-          base64: data,
-          fontFace: fontFace
-        }));
-        // opentype.load('fonts/Roboto-Black.ttf', function(err, font) {
-      // }).then( (ot) => {
-      // dispatch(_addedFontAction({ ... }))
+        load(data, function(err, font) {
+          console.log(err)
+          dispatch(_addedFontAction( {
+            name: fontFile.name,
+            base64: data,
+            fontFace: fontFace,
+            otFont: font
+          }));
+        });
+
       })
    };
 }
