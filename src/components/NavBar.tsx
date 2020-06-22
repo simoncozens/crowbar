@@ -36,16 +36,15 @@ const NavBar = (props: PropsFromRedux) => {
   const handleDrawerClose = () => {setOpen(false); };
 
   const theme = useTheme();
+  var action = props.addedFontAction;
   const onDrop = useCallback(acceptedFiles => {
     if (!acceptedFiles[0].name.endsWith(".otf") &&
         !acceptedFiles[0].name.endsWith(".ttf")) {
       setShaking(true)
     } else {
-      props.addedFontAction(acceptedFiles[0])
+      action(acceptedFiles[0])
     }
-  }, [])
-
-  const connector = connect(mapStateToProps, {changedTextAction})
+  }, [action])
 
   const {getRootProps, getInputProps, isDragAccept,
   } = useDropzone({onDrop,
@@ -115,4 +114,4 @@ const NavBar = (props: PropsFromRedux) => {
     </div>
     )
 }
-export default NavBar;
+export default connector(NavBar);
