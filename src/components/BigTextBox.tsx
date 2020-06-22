@@ -14,7 +14,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 const useStyles = makeStyles((theme: Theme) =>
 createStyles({
   root: {
-    ...theme.typography.h1,
+    ...theme.typography.h2,
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(1),
   },
