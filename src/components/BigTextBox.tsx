@@ -30,7 +30,12 @@ const BigTextBox = (props: PropsFromRedux) => {
     props.changedTextAction(value);
   }
   return (
-    <Input classes={classes} style={restyle} onChange={ (e) => handleChange(e) } id="inputtext" />
+    <Input
+      classes={classes}
+      style={restyle}
+      onChange={ (e) => handleChange(e) }
+      placeholder="ABC abc"
+      id="inputtext" />
   )
 }
 
