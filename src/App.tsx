@@ -65,6 +65,8 @@ const App = (props: PropsFromRedux) => {
       ).then(bytes =>
         WebAssembly.instantiate(bytes)
       ).then(results => {
+        // @ts-ignore
+        results.instance.exports.memory.grow(400);
         var hb = hbjs(results.instance); // Dirty but works
         window["hbjs"] = hb;
       })
