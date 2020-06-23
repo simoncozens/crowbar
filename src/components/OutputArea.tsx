@@ -20,7 +20,7 @@ import {  makeStyles } from '@material-ui/core/styles';
 const mapStateToProps = (state:CrowbarState) => {
   const font: CrowbarFont = state.fonts[state.selected_font];
   const text: string = state.inputtext
-  return {font, text};
+  return {font, text, features: state.features};
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -74,7 +74,7 @@ const OutputArea = (props: PropsFromRedux) => {
 	}
 
 	if (props.font && props.font.hbFont && props.text) {
-		var shaping = props.font.shapeTrace(props.text,"");
+		var shaping = props.font.shapeTrace(props.text,props.features);
 
 		console.log("Calling svg with", shaping[shaping.length-1].t)
 

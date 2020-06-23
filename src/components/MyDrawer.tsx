@@ -33,7 +33,7 @@ const MyDrawer = (props: PropsFromRedux) => {
   var features;
   if (font) {
     features = <div>
-      <h2>Features</h2>
+      <h2 className={classes.smallspace}>Features</h2>
       <div className={classes.chipArray}>
         { font.allFeatureTags().map( (x) => <Chip
           key={x}
