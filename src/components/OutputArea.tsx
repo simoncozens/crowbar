@@ -17,6 +17,7 @@ import {SVGArea} from "./SVGArea";
 import {paletteFor} from '../palette';
 import {  makeStyles } from '@material-ui/core/styles';
 import { diff, Diff, DiffEdit } from 'deep-diff';
+import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
 
 const mapStateToProps = (state:CrowbarState) => {
   const font: CrowbarFont = state.fonts[state.selected_font];
@@ -58,7 +59,6 @@ const glyphToHTML = (glyph:HBGlyph, font: CrowbarFont, color:string) => {
 
 function processDiffArray(diffOutput: Array<Diff<HBGlyph[], HBGlyph[]>>) : string[] {
 	var output = []
-	console.log(diffOutput);
 	for (var d of diffOutput) {
 		if (d.kind == "A") {
 			output[d.index] = "glyphadded";
@@ -99,7 +99,9 @@ const OutputArea = (props: PropsFromRedux) => {
 		lastRow = row.t;
 		return (
 	    <TableRow key={row.m}>
-		    <TableCell>{row.m}
+		    <TableCell>
+		    {row.depth >1 && <SubdirectoryArrowRightIcon/> }
+		    {row.m}
 		    {featurename && <br/>}
 		    {featurename && <b>{featurename}</b>}
 		    </TableCell>
@@ -113,7 +115,6 @@ const OutputArea = (props: PropsFromRedux) => {
 	if (props.font && props.font.hbFont && props.text) {
 		var shaping = props.font.shapeTrace(props.text,props.features);
 
-		console.log("Calling svg with", shaping[shaping.length-1].t)
 		lastRow = [];
 		return (
 		<div>

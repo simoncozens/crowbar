@@ -15,6 +15,7 @@ export interface HBGlyph {
 export interface StageMessage {
 	m: string;
 	t: HBGlyph[];
+	depth: number;
 }
 
 function onlyUnique(value:any, index:number, self:any) {return self.indexOf(value) === index; }
@@ -79,24 +80,36 @@ export class CrowbarFont {
 	  buffer.addText(s)
 	  buffer.guessSegmentProperties()
 	  var result: StageMessage[] = buffer.shapeWithTrace(font,featurestring);
+
+	  // Set depths
+	  var depth = 0;
+	  result.forEach((r:StageMessage, ix:number) => {
+	  	if (r.m.startsWith("start lookup")) { depth++; }
+	  	r.depth = depth;
+	  	if (r.m.startsWith("end lookup"))   { depth--; }
+	  });
 	  // Reduce this
 	  var newResult :StageMessage[] = [];
 	  var lastBuf = "";
-	  for (var r of result) {
+	  var lastMsg = "";
+	  result.forEach((r:StageMessage, ix:number) => {
 	  	if (r.m.startsWith("start table") || r.m.endsWith("start table")) {
 	  		r.t = [];
 	  		newResult.push(r);
-	  		continue;
+	  		return;
 	  	}
-	  	if (JSON.stringify(r.t) !== lastBuf) {
+	  	if (JSON.stringify(r.t) !== lastBuf ||
+	  		(r.m.startsWith("start lookup") && result[ix+1] && result[ix+1].depth! > r.depth!)) {
 	  		lastBuf = JSON.stringify(r.t);
 	  		newResult.push(r)
 	  	}
-	  }
+  		lastMsg = r.m;
+	  });
   	newResult.push({m: "End of shaping",
-	  		t: buffer.json()
+	  		t: buffer.json(),
+	  		depth: 0
   	})
-  	for (r of newResult) {
+  	for (var r of newResult) {
 	  	for (var t of r.t) {
 	  		if (!t.ax || t.ax === 0) { delete t.ax; }
 	  		if (!t.ay || t.ay === 0) { delete t.ay; }
