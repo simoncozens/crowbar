@@ -60,10 +60,23 @@
 
 }
 
+.MuiTableCell-body:hover .glyphadded {background-color: #e4fae4; }
+.MuiTableCell-body:hover .glyphmodified {background-color: #fafae4; }
+
 .glyphbox { display: table-cell;
-    border-right: 1px dotted white;
-    padding: 0px 5px;
+    border-right: 1px dotted black;
+    padding: 10px 10px;
     text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+  .glyphbox { background-color: #eaeaea; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .MuiTableCell-body:hover .glyphadded {background-color: #424a42; }
+  .MuiTableCell-body:hover .glyphmodified {background-color: #4a4a42; }
+  .glypbox { border-right: 1px dotted white; }
 }
 
 .shake {
