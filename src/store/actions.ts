@@ -1,4 +1,5 @@
 import { Font, load } from 'opentype.js';
+declare var window: any;
 
 export const ADDED_FONT = 'ADDED_FONT'
 export const CHANGED_TEXT = 'CHANGED_TEXT'
@@ -18,7 +19,7 @@ export interface CrowbarFont {
 	name:   string;
   base64: string;
   fontFace: string;
-  blob?: ArrayBuffer;
+  hbFont?: any;
   otFont?: Font;
 }
 
@@ -49,13 +50,18 @@ export function addedFontAction (fontFile: File) {
         var ab = result as ArrayBuffer;
         var data = "data:application/octet-stream;base64,"+_arrayBufferToBase64(ab);
         var fontFace = "@font-face{font-family:\"" + fontFile.name + "\"; src:url(" + data + ");}";
+        var hbjs = window["hbjs"];
+        var blob = hbjs.createBlob(ab);
+        var face = hbjs.createFace(blob, 0);
+        var hbFont = hbjs.createFont(face);
+
 
         load(data, function(err, font) {
           dispatch(_addedFontAction( {
             name: fontFile.name,
             base64: data,
             fontFace: fontFace,
-            blob: ab,
+            hbFont: hbFont,
             otFont: font
           }));
         });

@@ -11,7 +11,7 @@ function hbjs(instance) {
 
   function createBlob(blob) {
     var blobPtr = exports.malloc(blob.byteLength);
-    heapu8.set(blob, blobPtr);
+    heapu8.set(new Uint8Array(blob), blobPtr);
     var ptr = exports.hb_blob_create(blobPtr, blob.byteLength, HB_MEMORY_MODE_WRITABLE, blobPtr, exports.free_ptr());
     return {
       ptr: ptr,
@@ -75,12 +75,14 @@ function hbjs(instance) {
         exports.hb_shape(font.ptr, ptr, 0, 0);
       },
       shapeWithTrace: function (font, features) {
-        var traceBuffer = exports.malloc(2048);
+        var bufLen = 1024 * 1024;
+        var traceBuffer = exports.malloc(bufLen);
         var featurestr = createCString(features);
-        var traceLen = exports.hbjs_shape_with_trace(font.ptr, ptr, featurestr.ptr, 0, traceBuffer, 2048);
+        var traceLen = exports.hbjs_shape_with_trace(font.ptr, ptr, featurestr.ptr, 0, traceBuffer, bufLen);
         var trace =  utf8Decoder.decode(heapu8.slice(traceBuffer, traceBuffer + traceLen -1))
         exports.free(traceBuffer);
-        return JSON.parse(trace);
+        return trace;
+        // return JSON.parse(trace);
       },
       json: function (font) {
         var length = exports.hb_buffer_get_length(ptr);

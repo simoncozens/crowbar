@@ -6,6 +6,7 @@ import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/sty
 import CssBaseline from '@material-ui/core/CssBaseline';
 import './App.css';
 import NavBar from './components/NavBar'
+import OutputArea from './components/OutputArea'
 import BigTextBox from './components/BigTextBox'
 import { connect, ConnectedProps } from 'react-redux'
 import { CrowbarState, CrowbarFont } from "./store/actions";
@@ -59,18 +60,6 @@ const App = (props: PropsFromRedux) => {
       }),
     [prefersDarkMode],
   );
-  useEffect( () => {
-      fetch('/harfbuzz.wasm').then(response =>
-        response.arrayBuffer()
-      ).then(bytes =>
-        WebAssembly.instantiate(bytes)
-      ).then(results => {
-        // @ts-ignore
-        results.instance.exports.memory.grow(400);
-        var hb = hbjs(results.instance); // Dirty but works
-        window["hbjs"] = hb;
-      })
-  })
 
   // XXX subscribe to drawer state and set attribute on main
       //   className={clsx(classes.content, {
@@ -88,6 +77,7 @@ const App = (props: PropsFromRedux) => {
       <main className={classes.content}>
         <div className={classes.drawerHeader} />
         <BigTextBox/>
+        <OutputArea/>
        </main>
       <NavBar />
       </div>

@@ -28,7 +28,6 @@ const BigTextBox = (props: PropsFromRedux) => {
   } as React.CSSProperties;
   const handleChange = (e: any) => {
     let value = e.target.value;
-    console.log(shapeTrace(value, props.font, ""))
     props.changedTextAction(value);
   }
   return (
