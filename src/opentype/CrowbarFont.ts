@@ -1,4 +1,4 @@
-import { Font, load, Glyph } from 'opentype.js';
+import { Font, load, Glyph, Path } from 'opentype.js';
 
 declare var window: any;
 
@@ -61,18 +61,29 @@ export class CrowbarFont {
 	getSVG(gid: number): any {
 		var hbjs = window["hbjs"];
 		var svgText = hbjs.glyphToSvg(this.hbFont, gid);
+		if (svgText.length < 100) {
+			var glyph = this.getGlyph(gid);
+			if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
+			svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
+			console.log("Getting from OT", svgText);
+		} else {
+			console.log("Getting from HB", svgText);
+
+		}
 		var parser = new DOMParser();
 		var doc = parser.parseFromString(svgText, "image/svg+xml");
+		console.log(doc)
 		return doc.documentElement;
 	}
 
-	shapeTrace(s: string, features: string): StageMessage[] {
+	shapeTrace(s: string, features: any): StageMessage[] {
 		var hbjs = window["hbjs"];
+		var featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(',')
 		var font = this.hbFont;
 	  var buffer = hbjs.createBuffer()
 	  buffer.addText(s)
 	  buffer.guessSegmentProperties()
-	  var result: StageMessage[] = buffer.shapeWithTrace(font,features);
+	  var result: StageMessage[] = buffer.shapeWithTrace(font,featurestring);
 	  // Reduce this
 	  var newResult :StageMessage[] = [];
 	  var lastBuf = "";
