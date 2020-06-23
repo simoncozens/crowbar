@@ -1,5 +1,5 @@
 import React from 'react';
-// import clsx from 'clsx';
+import clsx from 'clsx';
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/styles';
@@ -12,8 +12,10 @@ import { connect, ConnectedProps } from 'react-redux'
 import { CrowbarState } from "./store/actions";
 
 const mapStateToProps = (state:CrowbarState) => {
-  return { fontFaces: state.fonts.map( (x) => x.fontFace ),
-           };
+  return { 
+    fontFaces: state.fonts.map( (x) => x.fontFace ),
+    drawerOpen: state.drawerOpen
+   };
 };
 
 const connector = connect(mapStateToProps, {})
@@ -43,6 +45,13 @@ const useStyles = makeStyles((theme) => ({
     }),
     marginRight: -drawerWidth,
   },
+    contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginRight: 0,
+  },
 }));
 const App = (props: PropsFromRedux) => {
   const classes = useStyles();
@@ -58,11 +67,6 @@ const App = (props: PropsFromRedux) => {
     [prefersDarkMode],
   );
 
-  // XXX subscribe to drawer state and set attribute on main
-      //   className={clsx(classes.content, {
-      //     [classes.contentShift]: open,
-      //   })}
-      // >
 
   return (
    <ThemeProvider theme={theme}>
@@ -71,7 +75,10 @@ const App = (props: PropsFromRedux) => {
    </style>
     <div className={classes.root}>
       <CssBaseline/>
-      <main className={classes.content}>
+      <main className={clsx(classes.content, {
+          [classes.contentShift]: props.drawerOpen,
+        })}
+      >
         <div className={classes.drawerHeader} />
         <BigTextBox/>
         <OutputArea/>

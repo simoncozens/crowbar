@@ -66,4 +66,12 @@ export const useStyles = makeStyles((theme) => ({
     }),
     marginRight: 0,
   },
+  chipArray: {
+      display: 'flex',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      '& > *': {
+        margin: theme.spacing(0.5),
+      },
+    },
 }));

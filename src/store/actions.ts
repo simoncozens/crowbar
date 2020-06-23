@@ -3,6 +3,19 @@ import {CrowbarFont} from '../opentype/CrowbarFont';
 export const ADDED_FONT = 'ADDED_FONT'
 export const CHANGED_TEXT = 'CHANGED_TEXT'
 export const CHANGED_FONT = 'CHANGED_FONT'
+export const CHANGED_FEATURE_STATE = 'CHANGED_FEATURE_STATE'
+export const CHANGED_DRAWER_STATE = 'CHANGED_DRAWER_STATE'
+
+export const changedFeatureState = (featureName: string) => ({
+  type: CHANGED_FEATURE_STATE,
+  feature: featureName
+})
+
+
+export const changedDrawerState = (open:boolean) => ({
+  type: CHANGED_DRAWER_STATE,
+  open
+})
 
 export const changedTextAction = (content:string) => ({
   type: CHANGED_TEXT,
@@ -41,11 +54,15 @@ export interface CrowbarState {
 	selected_font: number;
 	fonts: CrowbarFont[];
 	inputtext: string;
+  drawerOpen: boolean;
+  features: any;
 }
 
 export const initialState: CrowbarState = {
   selected_font: 0,
   fonts: [
   ],
-  inputtext: ""
+  inputtext: "",
+  drawerOpen: false,
+  features: {},
 }

@@ -17,6 +17,8 @@ export interface StageMessage {
 	t: HBGlyph[];
 }
 
+function onlyUnique(value:any, index:number, self:any) {return self.indexOf(value) === index; }
+
 
 function _arrayBufferToBase64( buffer: ArrayBuffer ) {
     var binary = '';
@@ -104,4 +106,19 @@ export class CrowbarFont {
 		if (!this.otFont) { return null }
 		return this.otFont.glyphs.get(gid);
 	}
+
+	gsubFeatureTags() :string[] {
+		if (!this.otFont) { return [] }
+		return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique)
+	}
+
+	gposFeatureTags() :string[] {
+		if (!this.otFont) { return [] }
+		return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique)
+	}
+
+	allFeatureTags() :string[] {
+		return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(onlyUnique)
+	}
+
 }
