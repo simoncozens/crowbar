@@ -65,14 +65,9 @@ export class CrowbarFont {
 			var glyph = this.getGlyph(gid);
 			if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
 			svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
-			console.log("Getting from OT", svgText);
-		} else {
-			console.log("Getting from HB", svgText);
-
 		}
 		var parser = new DOMParser();
 		var doc = parser.parseFromString(svgText, "image/svg+xml");
-		console.log(doc)
 		return doc.documentElement;
 	}
 
@@ -101,12 +96,12 @@ export class CrowbarFont {
   	newResult.push({m: "End of shaping",
 	  		t: buffer.json()
   	})
-  	for (var r of newResult) {
+  	for (r of newResult) {
 	  	for (var t of r.t) {
-	  		if (!t.ax || t.ax == 0) { delete t.ax; }
-	  		if (!t.ay || t.ay == 0) { delete t.ay; }
-	  		if (!t.dx || t.dx == 0) { delete t.dx; }
-	  		if (!t.dy || t.dy == 0) { delete t.dy; }
+	  		if (!t.ax || t.ax === 0) { delete t.ax; }
+	  		if (!t.ay || t.ay === 0) { delete t.ay; }
+	  		if (!t.dx || t.dx === 0) { delete t.dx; }
+	  		if (!t.dy || t.dy === 0) { delete t.dy; }
 	  	}
 	  }
 
@@ -135,7 +130,7 @@ export class CrowbarFont {
 	getFeatureForIndex(ix:number, stage:string) {
 		var features
 		if (!this.otFont) { return "" }
-		if (stage == "GSUB") {
+		if (stage === "GSUB") {
 			features = this.otFont.tables.gsub.features
 		} else {
 			features = this.otFont.tables.gpos.features
