@@ -1,4 +1,4 @@
-import { Font, load } from 'opentype.js';
+import { Font, load, Glyph } from 'opentype.js';
 
 declare var window: any;
 
@@ -72,7 +72,7 @@ export class CrowbarFont {
 	  buffer.guessSegmentProperties()
 	  var result: StageMessage[] = buffer.shapeWithTrace(font,features);
 	  // Reduce this
-	  var newResult = [];
+	  var newResult :StageMessage[] = [];
 	  var lastBuf = "";
 	  for (var r of result) {
 	  	if (r.m.startsWith("start table") || r.m.endsWith("start table")) {
@@ -85,8 +85,23 @@ export class CrowbarFont {
 	  		newResult.push(r)
 	  	}
 	  }
+  	newResult.push({m: "End of shaping",
+	  		t: buffer.json()
+  	})
+  	for (var r of newResult) {
+	  	for (var t of r.t) {
+	  		if (!t.ax || t.ax == 0) { delete t.ax; }
+	  		if (!t.ay || t.ay == 0) { delete t.ay; }
+	  		if (!t.dx || t.dx == 0) { delete t.dx; }
+	  		if (!t.dy || t.dy == 0) { delete t.dy; }
+	  	}
+	  }
+
 		return newResult;
 	}
 
-
+	getGlyph(gid:number) :Glyph|null {
+		if (!this.otFont) { return null }
+		return this.otFont.glyphs.get(gid);
+	}
 }

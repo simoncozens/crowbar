@@ -13,6 +13,11 @@
   }
 }
 
+.MuiTableCell-body {
+    color: #fff;
+    min-width: 120px;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -35,6 +40,30 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.svgbox{
+  display:flex;
+    flex-flow: column;
+  width: 40%;
+  max-height : 200px;
+}
+.svgwrapper {
+    width: 40%;
+    max-height : 200px;
+    background: #f5f5f5;
+    padding:5px;
+    position: fixed;
+    top: 80px;
+    left: 60%;
+    z-index: 5;
+
+}
+
+.glyphbox { display: table-cell;
+    border-right: 1px dotted white;
+    padding: 0px 5px;
+    text-align: center;
 }
 
 .shake {
