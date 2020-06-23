@@ -1,6 +1,4 @@
 function hbjs(instance) {
-  'use strict';
-
   var exports = instance.exports;
   var heapu8 = new Uint8Array(exports.memory.buffer);
   var heapu32 = new Uint32Array(exports.memory.buffer);
@@ -81,8 +79,7 @@ function hbjs(instance) {
         var traceLen = exports.hbjs_shape_with_trace(font.ptr, ptr, featurestr.ptr, 0, traceBuffer, bufLen);
         var trace =  utf8Decoder.decode(heapu8.slice(traceBuffer, traceBuffer + traceLen -1))
         exports.free(traceBuffer);
-        return trace;
-        // return JSON.parse(trace);
+        return JSON.parse(trace);
       },
       json: function (font) {
         var length = exports.hb_buffer_get_length(ptr);
