@@ -53,19 +53,29 @@ const glyphToHTML = (glyph:HBGlyph, font: CrowbarFont) => {
 
 const OutputArea = (props: PropsFromRedux) => {
 	var classes = useStyles();
-
+	var stage = "GSUB"
 	const rowToHTML = (row:StageMessage, font: CrowbarFont) => {
 		var  m = row.m.match(/start table (....)/);
 		if (m ) {
+			stage = m[1];
 			return (
 	      <TableRow>
 	        <TableCell colSpan={2} className={classes.stageheader}> {m[1]} Stage</TableCell>
 	      </TableRow>
 			)
 		}
+		var  m2 = row.m.match(/lookup (\d+)/);
+		var featurename = "";
+		if (m2) {
+			var ix = parseInt(m2[1]);
+			featurename = font.getFeatureForIndex(ix, stage);
+		}
 		return (
 	    <TableRow key={row.m}>
-		    <TableCell>{row.m}</TableCell>
+		    <TableCell>{row.m}
+		    {featurename && <br/>}
+		    {featurename}
+		    </TableCell>
 		    <TableCell>
 		      {row.t.map((glyph: HBGlyph) => glyphToHTML(glyph, font))}
 	      </TableCell>

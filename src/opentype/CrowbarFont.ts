@@ -132,4 +132,20 @@ export class CrowbarFont {
 		return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(onlyUnique)
 	}
 
+	getFeatureForIndex(ix:number, stage:string) {
+		var features
+		if (!this.otFont) { return "" }
+		if (stage == "GSUB") {
+			features = this.otFont.tables.gsub.features
+		} else {
+			features = this.otFont.tables.gpos.features
+		}
+		var featuremap = [];
+		for (var f of features.filter(onlyUnique)) {
+			var li: number;
+			for (li of f.feature.lookupListIndexes) { featuremap[li] = f.tag }
+		}
+		return featuremap[ix];
+	}
+
 }
