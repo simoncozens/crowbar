@@ -16,6 +16,7 @@ import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import {SVGArea} from "./SVGArea";
 import {paletteFor} from '../palette';
 import {  makeStyles } from '@material-ui/core/styles';
+import { diff, Diff, DiffEdit } from 'deep-diff';
 
 const mapStateToProps = (state:CrowbarState) => {
   const font: CrowbarFont = state.fonts[state.selected_font];
@@ -25,35 +26,54 @@ const mapStateToProps = (state:CrowbarState) => {
 
 const useStyles = makeStyles((theme) => ({
   stageheader: {
-    backgroundColor: theme.palette.info.dark
+    backgroundColor: theme.palette.info.main
   }
 }));
 
 const connector = connect(mapStateToProps)
 type PropsFromRedux = ConnectedProps<typeof connector>
 
-const glyphToHTML = (glyph:HBGlyph, font: CrowbarFont) => {
+const glyphToHTML = (glyph:HBGlyph, font: CrowbarFont, color:string) => {
 	var fGlyph = font.getGlyph(glyph.g);
 	return (
-		<div className="glyphbox" style={{color: paletteFor(glyph.cl)}}>
+		<div className={"glyphbox "+color} style={{
+			color: paletteFor(glyph.cl)
+		}}
+		>
 			{fGlyph && fGlyph.name} ({glyph.g})
-				<div>&nbsp;
-			{glyph.ax && <span><ArrowForwardIcon/> {glyph.ax}</span> }
-			{glyph.ay && <span><ArrowUpwardIcon/> {glyph.ay}</span> }
+			{ (glyph.ax||glyph.ay) &&	<div>
+					{glyph.ax && <span><ArrowForwardIcon/> {glyph.ax}</span> }
+					{glyph.ay && <span><ArrowUpwardIcon/> {glyph.ay}</span> }
 				</div>
-				<div>&nbsp;
-			{glyph.dx && <span><ArrowRightIcon/> {glyph.dx}</span> }
-			{glyph.dy && <span><ArrowDropUpIcon/> {glyph.dy}</span> }
-				</div>
+			}
+			{ (glyph.dx || glyph.dy) &&	<div>
+				{glyph.dx && <span><ArrowRightIcon/> {glyph.dx}</span> }
+				{glyph.dy && <span><ArrowDropUpIcon/> {glyph.dy}</span> }
+					</div>
+			}
 
 		</div>
 	)
 };
 
+function processDiffArray(diffOutput: Array<Diff<HBGlyph[], HBGlyph[]>>) : string[] {
+	var output = []
+	console.log(diffOutput);
+	for (var d of diffOutput) {
+		if (d.kind == "A") {
+			output[d.index] = "glyphadded";
+		} else if (d.kind == "E" || d.kind == "N") {
+			// @ts-ignore
+			output[(d as DiffEdit<HBGlyph[],HBGlyph[]>).path[0]] = "glyphmodified"
+		}
+	}
+	return output
+}
 
 const OutputArea = (props: PropsFromRedux) => {
 	var classes = useStyles();
 	var stage = "GSUB"
+	var lastRow: HBGlyph[] = [];
 	const rowToHTML = (row:StageMessage, font: CrowbarFont) => {
 		var  m = row.m.match(/start table (....)/);
 		if (m ) {
@@ -64,20 +84,27 @@ const OutputArea = (props: PropsFromRedux) => {
 	      </TableRow>
 			)
 		}
+		var diffColors: string[];
+		diffColors = [];
+		if (lastRow) {
+			var diffarray = diff(lastRow, row.t);
+			if (diffarray) { diffColors = processDiffArray(diffarray) }
+		}
 		var  m2 = row.m.match(/lookup (\d+)/);
 		var featurename = "";
 		if (m2) {
 			var ix = parseInt(m2[1]);
 			featurename = font.getFeatureForIndex(ix, stage);
 		}
+		lastRow = row.t;
 		return (
 	    <TableRow key={row.m}>
 		    <TableCell>{row.m}
 		    {featurename && <br/>}
-		    {featurename}
+		    {featurename && <b>{featurename}</b>}
 		    </TableCell>
 		    <TableCell>
-		      {row.t.map((glyph: HBGlyph) => glyphToHTML(glyph, font))}
+		      {row.t.map((glyph: HBGlyph, ix:number) => glyphToHTML(glyph, font, diffColors[ix]))}
 	      </TableCell>
 		  </TableRow>
 	  )
@@ -87,7 +114,7 @@ const OutputArea = (props: PropsFromRedux) => {
 		var shaping = props.font.shapeTrace(props.text,props.features);
 
 		console.log("Calling svg with", shaping[shaping.length-1].t)
-
+		lastRow = [];
 		return (
 		<div>
 
