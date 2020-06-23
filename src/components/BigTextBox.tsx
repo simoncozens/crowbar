@@ -1,9 +1,9 @@
 import React from 'react'
 import Input from '@material-ui/core/Input';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { changedTextAction, CrowbarState, CrowbarFont } from "../store/actions";
+import { changedTextAction, CrowbarState } from "../store/actions";
+import {CrowbarFont} from '../opentype/CrowbarFont';
 import { connect, ConnectedProps } from 'react-redux'
-import {shapeTrace} from '../opentype/shaper';
 
 const mapStateToProps = (state:CrowbarState) => {
   const font: CrowbarFont = state.fonts[state.selected_font];
@@ -23,9 +23,10 @@ createStyles({
 
 const BigTextBox = (props: PropsFromRedux) => {
   const classes = useStyles();
-  const restyle = {
-    'font-family': '"'+props.font.name+'"'
-  } as React.CSSProperties;
+  var restyle;
+  if (props.font) {
+    restyle = { 'font-family': '"'+props.font.name+'"'} as React.CSSProperties;
+  }
   const handleChange = (e: any) => {
     let value = e.target.value;
     props.changedTextAction(value);

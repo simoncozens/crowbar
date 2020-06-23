@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 // import clsx from 'clsx';
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -9,10 +9,7 @@ import NavBar from './components/NavBar'
 import OutputArea from './components/OutputArea'
 import BigTextBox from './components/BigTextBox'
 import { connect, ConnectedProps } from 'react-redux'
-import { CrowbarState, CrowbarFont } from "./store/actions";
-import hbjs from './hbjs';
-
-declare var window: any;
+import { CrowbarState } from "./store/actions";
 
 const mapStateToProps = (state:CrowbarState) => {
   return { fontFaces: state.fonts.map( (x) => x.fontFace ),

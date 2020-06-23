@@ -5,7 +5,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import { fade,makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { connect, ConnectedProps } from 'react-redux'
-import { changedFontAction, CrowbarState, CrowbarFont } from "../store/actions";
+import {CrowbarFont} from '../opentype/CrowbarFont';
+import { changedFontAction, CrowbarState } from "../store/actions";
 
 const mapStateToProps = (state:CrowbarState) => {
   const fonts: CrowbarFont[] = state.fonts;
