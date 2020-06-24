@@ -108,8 +108,8 @@ function hbjs(instance) {
   }
 
   function glyphToSvg(font, glyphId) {
-    var pathBuffer = exports.malloc(2048);
-    var svgLength = exports.hbjs_glyph_svg(font.ptr, glyphId, pathBuffer, 2048);
+    var pathBuffer = exports.malloc(4096);
+    var svgLength = exports.hbjs_glyph_svg(font.ptr, glyphId, pathBuffer, 4096);
     var path = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="' +
       utf8Decoder.decode(heapu8.slice(pathBuffer, pathBuffer + svgLength)) +
       '"/></svg>';
