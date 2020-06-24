@@ -86,11 +86,12 @@ export class CrowbarFont {
 		return doc.documentElement;
 	}
 
-	shapeTrace(s: string, features: any): StageMessage[] {
+	shapeTrace(s: string, features: any, clusterLevel: number): StageMessage[] {
 		var hbjs = window["hbjs"];
 		var featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(',')
 		var font = this.hbFont;
 	  var buffer = hbjs.createBuffer()
+	  buffer.setClusterLevel(clusterLevel)
 	  buffer.addText(s)
 	  buffer.guessSegmentProperties()
 	  var result: StageMessage[] = buffer.shapeWithTrace(font,featurestring);

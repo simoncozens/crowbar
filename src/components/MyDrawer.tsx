@@ -4,23 +4,28 @@ import { useTheme } from '@material-ui/core/styles';
 import {useStyles } from '../navbarstyles';
 import {CrowbarFont } from '../opentype/CrowbarFont';
 import { connect, ConnectedProps } from 'react-redux'
-import { changedDrawerState, changedFeatureState, CrowbarState } from "../store/actions";
+import { changedDrawerState, changedFeatureState, changedClusterLevel, CrowbarState } from "../store/actions";
 import Drawer from '@material-ui/core/Drawer';
 import Divider from '@material-ui/core/Divider';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import IconButton from '@material-ui/core/IconButton';
 import Chip from '@material-ui/core/Chip';
+import Select from '@material-ui/core/Select';
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
 
 const mapStateToProps = (state:CrowbarState) => {
   return { open: state.drawerOpen,
    fonts: state.fonts,
    selectedFontIndex: state.selected_font,
-   featureState: state.features
+   featureState: state.features,
+   clusterLevel: state.clusterLevel
   };
 };
 
-const connector = connect(mapStateToProps, {changedDrawerState, changedFeatureState})
+const connector = connect(mapStateToProps, {changedDrawerState, changedFeatureState, changedClusterLevel})
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const MyDrawer = (props: PropsFromRedux) => {
@@ -64,6 +69,22 @@ const MyDrawer = (props: PropsFromRedux) => {
         </div>
         <Divider />
         {features}
+        <Divider />
+
+        <FormControl className={classes.formControl}>
+        <InputLabel id="cluster-level-label">Clustering</InputLabel>
+        <Select
+          labelId="cluster-level-label"
+          id="cluster-level"
+          value={props.clusterLevel}
+          onChange={(e) => props.changedClusterLevel(e.target.value as number)}
+        >
+          <MenuItem value={0}>Monotone graphemes</MenuItem>
+          <MenuItem value={1}>Monotone characters</MenuItem>
+          <MenuItem value={2}>Characters</MenuItem>
+        </Select>
+      </FormControl>
+
       </Drawer>
 
 }

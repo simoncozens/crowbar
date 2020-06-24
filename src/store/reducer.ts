@@ -3,6 +3,7 @@ import { ADDED_FONT,
   CHANGED_FONT,
   CHANGED_DRAWER_STATE,
   CHANGED_FEATURE_STATE,
+  CHANGED_CLUSTER_LEVEL,
   initialState } from './actions'
 
 export default function appReducer(state = initialState, action: any) {
@@ -14,6 +15,10 @@ export default function appReducer(state = initialState, action: any) {
     case CHANGED_TEXT:
       return Object.assign({}, state, {
         inputtext: action.inputtext
+      })
+    case CHANGED_CLUSTER_LEVEL:
+      return Object.assign({}, state, {
+        clusterLevel: action.clusterLevel
       })
     case CHANGED_DRAWER_STATE:
       console.log("Changed drawer state",action.open)

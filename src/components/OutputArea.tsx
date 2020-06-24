@@ -22,7 +22,7 @@ import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRigh
 const mapStateToProps = (state:CrowbarState) => {
   const font: CrowbarFont = state.fonts[state.selected_font];
   const text: string = state.inputtext
-  return {font, text, features: state.features};
+  return {font, text, features: state.features, clusterLevel: state.clusterLevel};
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -74,12 +74,13 @@ const OutputArea = (props: PropsFromRedux) => {
 	var classes = useStyles();
 	var stage = "GSUB"
 	var lastRow: HBGlyph[] = [];
+	var rowid = 0;
 	const rowToHTML = (row:StageMessage, font: CrowbarFont) => {
 		var  m = row.m.match(/start table (....)/);
 		if (m ) {
 			stage = m[1];
 			return (
-	      <TableRow>
+	      <TableRow key={rowid++}>
 	        <TableCell colSpan={2} className={classes.stageheader}> {m[1]} Stage</TableCell>
 	      </TableRow>
 			)
@@ -98,7 +99,7 @@ const OutputArea = (props: PropsFromRedux) => {
 		}
 		lastRow = row.t;
 		return (
-	    <TableRow key={row.m}>
+	    <TableRow key={rowid++}>
 		    <TableCell>
 		    {row.depth >1 && <SubdirectoryArrowRightIcon/> }
 		    {row.m}
@@ -113,7 +114,7 @@ const OutputArea = (props: PropsFromRedux) => {
 	}
 
 	if (props.font && props.font.hbFont && props.text) {
-		var shaping = props.font.shapeTrace(props.text,props.features);
+		var shaping = props.font.shapeTrace(props.text,props.features, props.clusterLevel);
 
 		lastRow = [];
 		return (
