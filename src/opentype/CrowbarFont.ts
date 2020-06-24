@@ -6,6 +6,7 @@ declare var window: any;
 export interface HBGlyph {
 	g: number,
 	cl: number,
+	offset: number,
 	dx?: number,
 	dy?: number,
 	ax?: number,
@@ -29,6 +30,19 @@ function _arrayBufferToBase64( buffer: ArrayBuffer ) {
         binary += String.fromCharCode( bytes[ i ] );
     }
     return btoa( binary );
+}
+
+function remapClusters(glyphs: HBGlyph[]) {
+	// We want cluster IDs to be sequential,
+	// not based on UTF8 offset
+	var clustermap: number[] = []
+	glyphs.forEach( (glyph: HBGlyph, ix:number) => {
+		glyph.offset = glyph.cl
+		if (clustermap.indexOf(glyph.cl) === -1) {
+			clustermap.push(glyph.cl)
+		}
+		glyph.cl = clustermap.indexOf(glyph.cl)
+	})
 }
 
 export class CrowbarFont {
@@ -83,10 +97,11 @@ export class CrowbarFont {
 
 	  // Set depths
 	  var depth = 0;
-	  result.forEach((r:StageMessage, ix:number) => {
+	  result.forEach((r:StageMessage) => {
 	  	if (r.m.startsWith("start lookup")) { depth++; }
 	  	r.depth = depth;
 	  	if (r.m.startsWith("end lookup"))   { depth--; }
+	  	remapClusters(r.t)
 	  });
 	  // Reduce this
 	  var newResult :StageMessage[] = [];
@@ -103,8 +118,10 @@ export class CrowbarFont {
 	  		newResult.push(r)
 	  	}
 	  });
+	  var endbuffer = buffer.json()
+	  remapClusters(endbuffer)
   	newResult.push({m: "End of shaping",
-	  		t: buffer.json(),
+	  		t: endbuffer,
 	  		depth: 0
   	})
   	for (var r of newResult) {
