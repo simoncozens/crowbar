@@ -43,7 +43,7 @@ const FontSelect = (props: PropsFromRedux) => {
           labelId="font-select-label"
           id="font-select"
           onChange={handleChange}
-          value={ props.fonts.length < props.selectedFontIndex ? props.selectedFontIndex : ""}
+          value={ props.fonts.length > props.selectedFontIndex ? props.selectedFontIndex : ""}
         >
             {props.fonts.map( (font:CrowbarFont,ix) => (
               <MenuItem value={ix}>{font.name}</MenuItem>
