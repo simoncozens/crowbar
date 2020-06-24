@@ -60,9 +60,9 @@ const glyphToHTML = (glyph:HBGlyph, font: CrowbarFont, color:string) => {
 function processDiffArray(diffOutput: Array<Diff<HBGlyph[], HBGlyph[]>>) : string[] {
 	var output = []
 	for (var d of diffOutput) {
-		if (d.kind == "A") {
+		if (d.kind === "A") {
 			output[d.index] = "glyphadded";
-		} else if (d.kind == "E" || d.kind == "N") {
+		} else if (d.kind === "E" || d.kind === "N") {
 			// @ts-ignore
 			output[(d as DiffEdit<HBGlyph[],HBGlyph[]>).path[0]] = "glyphmodified"
 		}

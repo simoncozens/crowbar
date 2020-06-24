@@ -91,7 +91,6 @@ export class CrowbarFont {
 	  // Reduce this
 	  var newResult :StageMessage[] = [];
 	  var lastBuf = "";
-	  var lastMsg = "";
 	  result.forEach((r:StageMessage, ix:number) => {
 	  	if (r.m.startsWith("start table") || r.m.endsWith("start table")) {
 	  		r.t = [];
@@ -103,7 +102,6 @@ export class CrowbarFont {
 	  		lastBuf = JSON.stringify(r.t);
 	  		newResult.push(r)
 	  	}
-  		lastMsg = r.m;
 	  });
   	newResult.push({m: "End of shaping",
 	  		t: buffer.json(),
@@ -128,11 +126,13 @@ export class CrowbarFont {
 
 	gsubFeatureTags() :string[] {
 		if (!this.otFont) { return [] }
+		if (!this.otFont.tables.gsub.features) { return [] }
 		return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique)
 	}
 
 	gposFeatureTags() :string[] {
 		if (!this.otFont) { return [] }
+		if (!this.otFont.tables.gpos.features) { return [] }
 		return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique)
 	}
 

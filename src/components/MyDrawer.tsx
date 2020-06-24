@@ -1,5 +1,4 @@
-import React, {useCallback} from 'react'
-import clsx from 'clsx';
+import React from 'react'
 import { useTheme } from '@material-ui/core/styles';
 
 import {useStyles } from '../navbarstyles';
@@ -7,7 +6,6 @@ import {CrowbarFont } from '../opentype/CrowbarFont';
 import { connect, ConnectedProps } from 'react-redux'
 import { changedDrawerState, changedFeatureState, CrowbarState } from "../store/actions";
 import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';

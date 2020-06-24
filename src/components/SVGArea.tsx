@@ -1,5 +1,5 @@
 import React, {useRef, useEffect} from 'react'
-import {CrowbarFont, StageMessage, HBGlyph} from '../opentype/CrowbarFont';
+import {CrowbarFont, HBGlyph} from '../opentype/CrowbarFont';
 import * as SVG from '@svgdotjs/svg.js';
 import {paletteFor} from '../palette';
 
@@ -19,7 +19,6 @@ function deleteAllChildren(e :any) {
 function glyphstringToSVG(glyphstring: HBGlyph[], font: CrowbarFont) :SVG.Svg{
 	var curAX = 0;
 	var curAY = 0;
-	var counter = 0;
 	var totalSVG = SVG.SVG();
 	var maingroup = totalSVG.group();
 	for (var g of glyphstring) {

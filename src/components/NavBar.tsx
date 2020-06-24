@@ -4,7 +4,6 @@ import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import MenuIcon from '@material-ui/icons/Menu';
-import { useTheme } from '@material-ui/core/styles';
 import FontSelect from './FontSelect'
 import {useDropzone} from 'react-dropzone'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
@@ -25,7 +24,6 @@ const NavBar = (props: PropsFromRedux) => {
   const classes = useStyles();
   const [shaking, setShaking] = React.useState(false);
 
-  const theme = useTheme();
   var action = props.addedFontAction;
   const handleDrawerOpen = () => { props.changedDrawerState(true); };
   const onDrop = useCallback(acceptedFiles => {
