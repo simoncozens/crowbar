@@ -60,6 +60,15 @@
 
 }
 
+.MuiTableRow-root:hover {
+  background-color: #525252;
+}
+
+@media (prefers-color-scheme: light) {
+  .MuiTableRow-root:hover {
+    background-color: #f3f3f3;
+  }
+}
 .MuiTableCell-body:hover .glyphadded {background-color: #e4fae4; }
 .MuiTableCell-body:hover .glyphmodified {background-color: #fafae4; }
 
