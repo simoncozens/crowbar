@@ -143,13 +143,13 @@ export class CrowbarFont {
 
 	gsubFeatureTags() :string[] {
 		if (!this.otFont) { return [] }
-		if (!this.otFont.tables.gsub.features) { return [] }
+		if (!this.otFont.tables.gsub) { return [] }
 		return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique)
 	}
 
 	gposFeatureTags() :string[] {
 		if (!this.otFont) { return [] }
-		if (!this.otFont.tables.gpos.features) { return [] }
+		if (!this.otFont.tables.gpos) { return [] }
 		return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique)
 	}
 
