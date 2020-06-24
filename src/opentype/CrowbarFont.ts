@@ -32,16 +32,15 @@ function _arrayBufferToBase64( buffer: ArrayBuffer ) {
     return btoa( binary );
 }
 
-function remapClusters(glyphs: HBGlyph[]) {
+function remapClusters(glyphs: HBGlyph[], clustermap: number[]) {
 	// We want cluster IDs to be sequential,
 	// not based on UTF8 offset
-	var clustermap: number[] = []
 	glyphs.forEach( (glyph: HBGlyph, ix:number) => {
-		glyph.offset = glyph.cl
-		if (clustermap.indexOf(glyph.cl) === -1) {
-			clustermap.push(glyph.cl)
+		if (!glyph.offset) { glyph.offset = glyph.cl }
+		if (clustermap.indexOf(glyph.offset) === -1) {
+			clustermap.push(glyph.offset)
 		}
-		glyph.cl = clustermap.indexOf(glyph.cl)
+		glyph.cl = clustermap.indexOf(glyph.offset)
 	})
 }
 
@@ -94,7 +93,11 @@ export class CrowbarFont {
 	  buffer.setClusterLevel(clusterLevel)
 	  buffer.addText(s)
 	  buffer.guessSegmentProperties()
+	  var preshape = buffer.json()
+
 	  var result: StageMessage[] = buffer.shapeWithTrace(font,featurestring);
+	  result.unshift({ m: "Start of shaping", t: preshape, depth: 0 })
+		var clustermap: number[] = []
 
 	  // Set depths
 	  var depth = 0;
@@ -102,7 +105,7 @@ export class CrowbarFont {
 	  	if (r.m.startsWith("start lookup")) { depth++; }
 	  	r.depth = depth;
 	  	if (r.m.startsWith("end lookup"))   { depth--; }
-	  	remapClusters(r.t)
+	  	remapClusters(r.t, clustermap)
 	  });
 	  // Reduce this
 	  var newResult :StageMessage[] = [];
@@ -120,7 +123,7 @@ export class CrowbarFont {
 	  	}
 	  });
 	  var endbuffer = buffer.json()
-	  remapClusters(endbuffer)
+	  remapClusters(endbuffer, clustermap)
   	newResult.push({m: "End of shaping",
 	  		t: endbuffer,
 	  		depth: 0

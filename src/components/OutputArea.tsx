@@ -76,6 +76,23 @@ const OutputArea = (props: PropsFromRedux) => {
 	var lastRow: HBGlyph[] = [];
 	var rowid = 0;
 	const rowToHTML = (row:StageMessage, font: CrowbarFont) => {
+		var  m = row.m.match(/Start of shaping/);
+		if (m) {
+			return props.clusterLevel == 2 ? (
+	      <TableRow key={rowid++}>
+	        <TableCell> Pre-shaping</TableCell>
+	        <TableCell>
+	        {row.t.map( (glyph) =>
+	        			<div className={"glyphbox"} style={{
+										color: paletteFor(glyph.cl)
+								}}>
+								U+{glyph.g.toString(16).padStart(4,"0")}
+								</div>
+	        )}
+	        </TableCell>
+	      </TableRow>
+			) : (<div/>)
+		}
 		var  m = row.m.match(/start table (....)/);
 		if (m ) {
 			stage = m[1];
