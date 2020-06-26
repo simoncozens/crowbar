@@ -36,9 +36,10 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const glyphToHTML = (glyph:HBGlyph, font: CrowbarFont, color:string) => {
   const fGlyph = font.getGlyph(glyph.g);
+  var baseOrMark = font.getGlyphClass(glyph.g) == 3 ? "markglyph" : "";
   return (
     <div
-      className={`glyphbox ${color}`}
+      className={`glyphbox ${color} ${baseOrMark}`}
       style={{
         color: paletteFor(glyph.cl)
       }}

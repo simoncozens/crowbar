@@ -1,6 +1,6 @@
 export var palette = [
   "#C23B23",
-  "#F39A27",
+  "#c79c52",
   "#EADA52",
   "#03C03C",
   "#579ABE",

@@ -78,8 +78,16 @@
     text-align: center;
 }
 
+.markglyph {
+    background-size: 6px 6px !important;
+    background-image: linear-gradient(-45deg, transparent 46%, #555 49%, #555 51%, transparent 55%);
+}
+
 @media (prefers-color-scheme: light) {
-  .glyphbox { background-color: #eaeaea; }
+  .glyphbox { background-color: #f3f3f3; }
+  .markglyph {
+    background-image: linear-gradient(-45deg, transparent 46%, #ccc 49%, #ccc 51%, transparent 55%);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
