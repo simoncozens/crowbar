@@ -21,7 +21,7 @@
     "@types/redux-thunk": "^2.1.0",
     "deep-diff": "^1.0.2",
     "material-ui-dropzone": "^3.3.0",
-    "opentype.js": "^1.3.3",
+    "opentype.js": "github:simoncozens/opentype.js#crowbar",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
