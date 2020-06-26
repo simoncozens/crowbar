@@ -38,7 +38,7 @@ const FontSelect = (props: PropsFromRedux) => {
   return (
     <div>
       <FormControl className={classes.fontSelect}>
-        <InputLabel id="font-select-label">Drag and Drop to Upload A Font</InputLabel>
+        <InputLabel id="font-select-label">Drag and drop to load a font</InputLabel>
         <Select
           labelId="font-select-label"
           id="font-select"
