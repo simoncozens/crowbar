@@ -177,4 +177,14 @@ export class CrowbarFont {
 		return featuremap[ix];
 	}
 
+	getGlyphClass(ix:number): number {
+		// Requires my crowbar branch of opentype.js
+		if (!this.otFont) { return 0 }
+		if (!this.otFont.tables.gdef) { return 0 }
+		return this.otFont.position.getGlyphClass(
+			this.otFontont.tables.gdef.classDef,
+			ix
+		);
+	}
+
 }
