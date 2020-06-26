@@ -1,6 +1,6 @@
-import { Font, load, Glyph, Path } from 'opentype.js';
+import { Font, load, Glyph, Path } from "opentype.js";
 
-declare var window: any;
+declare let window: any;
 
 
 export interface HBGlyph {
@@ -23,25 +23,25 @@ function onlyUnique(value:any, index:number, self:any) {return self.indexOf(valu
 
 
 function _arrayBufferToBase64( buffer: ArrayBuffer ) {
-    var binary = '';
-    var bytes = new Uint8Array( buffer );
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
+    let binary = "";
+    const bytes = new Uint8Array( buffer );
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
         binary += String.fromCharCode( bytes[ i ] );
     }
     return btoa( binary );
 }
 
 function remapClusters(glyphs: HBGlyph[], clustermap: number[]) {
-	// We want cluster IDs to be sequential,
-	// not based on UTF8 offset
-	glyphs.forEach( (glyph: HBGlyph, ix:number) => {
-		if (!glyph.offset) { glyph.offset = glyph.cl }
-		if (clustermap.indexOf(glyph.offset) === -1) {
-			clustermap.push(glyph.offset)
-		}
-		glyph.cl = clustermap.indexOf(glyph.offset)
-	})
+    // We want cluster IDs to be sequential,
+    // not based on UTF8 offset
+    glyphs.forEach( (glyph: HBGlyph, ix:number) => {
+        if (!glyph.offset) { glyph.offset = glyph.cl; }
+        if (clustermap.indexOf(glyph.offset) === -1) {
+            clustermap.push(glyph.offset);
+        }
+        glyph.cl = clustermap.indexOf(glyph.offset);
+    });
 }
 
 export class CrowbarFont {
@@ -52,64 +52,64 @@ export class CrowbarFont {
   otFont?: Font;
 
   constructor(name : string, fontBlob?: ArrayBuffer) {
-    this.name = name;
-    if (fontBlob) {
+      this.name = name;
+      if (fontBlob) {
 	    this.base64 = "data:application/octet-stream;base64,"+_arrayBufferToBase64(fontBlob);
 	    this.fontFace = "@font-face{font-family:\"" + name + "\"; src:url(" + this.base64 + ");}";
-	    var hbjs = window["hbjs"];
-	    var blob = hbjs.createBlob(fontBlob);
-	    var face = hbjs.createFace(blob, 0);
+	    const hbjs = window["hbjs"];
+	    const blob = hbjs.createBlob(fontBlob);
+	    const face = hbjs.createFace(blob, 0);
 	    this.hbFont = hbjs.createFont(face);
-    }
-    return this;
+      }
+      return this;
   }
 
   initOT(cb: any) {
-  	var that = this;
-    load(this.base64 as string, function(err, otFont) {
+  	const that = this;
+      load(this.base64 as string, function(err, otFont) {
     	that.otFont = otFont;
-    	cb(that)
-    });
+    	cb(that);
+      });
   }
 
-	getSVG(gid: number): any {
-		var hbjs = window["hbjs"];
-		var svgText = hbjs.glyphToSvg(this.hbFont, gid);
-		if (svgText.length < 100) {
-			var glyph = this.getGlyph(gid);
-			if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
-			svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
-		}
-		var parser = new DOMParser();
-		var doc = parser.parseFromString(svgText, "image/svg+xml");
-		return doc.documentElement;
-	}
+  getSVG(gid: number): any {
+      const hbjs = window["hbjs"];
+      let svgText = hbjs.glyphToSvg(this.hbFont, gid);
+      if (svgText.length < 100) {
+          const glyph = this.getGlyph(gid);
+          if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
+          svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
+      }
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgText, "image/svg+xml");
+      return doc.documentElement;
+  }
 
-	shapeTrace(s: string, features: any, clusterLevel: number, stopAt: number=0, stopPhase: number=0): StageMessage[] {
-		var hbjs = window["hbjs"];
-		var featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(',')
-		var font = this.hbFont;
-	  var buffer = hbjs.createBuffer()
-	  buffer.setClusterLevel(clusterLevel)
-	  buffer.addText(s)
-	  buffer.guessSegmentProperties()
-	  var preshape = buffer.json()
+  shapeTrace(s: string, features: any, clusterLevel: number, stopAt=0, stopPhase=0): StageMessage[] {
+      const hbjs = window["hbjs"];
+      const featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(",");
+      const font = this.hbFont;
+	  const buffer = hbjs.createBuffer();
+	  buffer.setClusterLevel(clusterLevel);
+	  buffer.addText(s);
+	  buffer.guessSegmentProperties();
+	  const preshape = buffer.json();
 
-	  var result: StageMessage[] = buffer.shapeWithTrace(font,featurestring, stopAt, stopPhase);
-	  result.unshift({ m: "Start of shaping", t: preshape, depth: 0 })
-		var clustermap: number[] = []
+	  const result: StageMessage[] = buffer.shapeWithTrace(font,featurestring, stopAt, stopPhase);
+	  result.unshift({ m: "Start of shaping", t: preshape, depth: 0 });
+      const clustermap: number[] = [];
 
 	  // Set depths
-	  var depth = 0;
+	  let depth = 0;
 	  result.forEach((r:StageMessage) => {
 	  	if (r.m.startsWith("start lookup")) { depth++; }
 	  	r.depth = depth;
 	  	if (r.m.startsWith("end lookup"))   { depth--; }
-	  	remapClusters(r.t, clustermap)
+	  	remapClusters(r.t, clustermap);
 	  });
 	  // Reduce this
-	  var newResult :StageMessage[] = [];
-	  var lastBuf = "";
+	  const newResult :StageMessage[] = [];
+	  let lastBuf = "";
 	  result.forEach((r:StageMessage, ix:number) => {
 	  	if (r.m.startsWith("start table") || r.m.endsWith("start table")) {
 	  		r.t = [];
@@ -119,17 +119,17 @@ export class CrowbarFont {
 	  	if (JSON.stringify(r.t) !== lastBuf ||
 	  		(r.m.startsWith("start lookup") && result[ix+1] && result[ix+1].depth! > r.depth!)) {
 	  		lastBuf = JSON.stringify(r.t);
-	  		newResult.push(r)
+	  		newResult.push(r);
 	  	}
 	  });
-	  var endbuffer = buffer.json()
-	  remapClusters(endbuffer, clustermap)
+	  const endbuffer = buffer.json();
+	  remapClusters(endbuffer, clustermap);
   	newResult.push({m: "End of shaping",
 	  		t: endbuffer,
 	  		depth: 0
-  	})
-  	for (var r of newResult) {
-	  	for (var t of r.t) {
+  	});
+  	for (const r of newResult) {
+	  	for (const t of r.t) {
 	  		if (!t.ax || t.ax === 0) { delete t.ax; }
 	  		if (!t.ay || t.ay === 0) { delete t.ay; }
 	  		if (!t.dx || t.dx === 0) { delete t.dx; }
@@ -137,54 +137,56 @@ export class CrowbarFont {
 	  	}
 	  }
 
-		return newResult;
-	}
+      return newResult;
+  }
 
-	getGlyph(gid:number) :Glyph|null {
-		if (!this.otFont) { return null }
-		return this.otFont.glyphs.get(gid);
-	}
+  getGlyph(gid:number) :Glyph|null {
+      if (!this.otFont) { return null; }
+      return this.otFont.glyphs.get(gid);
+  }
 
-	gsubFeatureTags() :string[] {
-		if (!this.otFont) { return [] }
-		if (!this.otFont.tables.gsub) { return [] }
-		return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique)
-	}
+  gsubFeatureTags() :string[] {
+      if (!this.otFont) { return []; }
+      if (!this.otFont.tables.gsub) { return []; }
+      return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique);
+  }
 
-	gposFeatureTags() :string[] {
-		if (!this.otFont) { return [] }
-		if (!this.otFont.tables.gpos) { return [] }
-		return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique)
-	}
+  gposFeatureTags() :string[] {
+      if (!this.otFont) { return []; }
+      if (!this.otFont.tables.gpos) { return []; }
+      return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique);
+  }
 
-	allFeatureTags() :string[] {
-		return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(onlyUnique)
-	}
+  allFeatureTags() :string[] {
+      return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(onlyUnique);
+  }
 
-	getFeatureForIndex(ix:number, stage:string) {
-		var features
-		if (!this.otFont) { return "" }
-		if (stage === "GSUB") {
-			features = this.otFont.tables.gsub.features
-		} else {
-			features = this.otFont.tables.gpos.features
-		}
-		var featuremap = [];
-		for (var f of features.filter(onlyUnique)) {
-			var li: number;
-			for (li of f.feature.lookupListIndexes) { featuremap[li] = f.tag }
-		}
-		return featuremap[ix];
-	}
+  getFeatureForIndex(ix:number, stage:string) {
+      let features;
+      if (!this.otFont) { return ""; }
+      if (stage === "GSUB") {
+          features = this.otFont.tables.gsub.features;
+      } else {
+          features = this.otFont.tables.gpos.features;
+      }
+      const featuremap = [];
+      for (const f of features.filter(onlyUnique)) {
+          var li: number;
+          for (li of f.feature.lookupListIndexes) { featuremap[li] = f.tag; }
+      }
+      return featuremap[ix];
+  }
 
-	getGlyphClass(ix:number): number {
-		// Requires my crowbar branch of opentype.js
-		if (!this.otFont) { return 0 }
-		if (!this.otFont.tables.gdef) { return 0 }
-		return this.otFont.position.getGlyphClass(
-			this.otFontont.tables.gdef.classDef,
-			ix
-		);
-	}
+  getGlyphClass(ix:number): number {
+      // Requires my crowbar branch of opentype.js
+      if (!this.otFont) { return 0; }
+      if (!this.otFont.tables.gdef) { return 0; }
+      // Types are wrong
+      // @ts-ignore
+      return this.otFont.position.getGlyphClass(
+          this.otFont.tables.gdef.classDef,
+          ix
+      );
+  }
 
 }
