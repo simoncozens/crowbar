@@ -33,4 +33,4 @@ Upcoming features can be found in the Issues section. If you want to request a f
 
 ## License
 
-This project is under an Apache license. See [LICENSE.md].
+This project is under an Apache license. See [LICENSE](LICENSE).
