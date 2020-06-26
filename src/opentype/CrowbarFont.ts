@@ -4,100 +4,100 @@ declare let window: any;
 
 
 export interface HBGlyph {
-	g: number,
-	cl: number,
-	offset: number,
-	dx?: number,
-	dy?: number,
-	ax?: number,
-	ay?: number
+  g: number,
+  cl: number,
+  offset: number,
+  dx?: number,
+  dy?: number,
+  ax?: number,
+  ay?: number
 }
 
 export interface StageMessage {
-	m: string;
-	t: HBGlyph[];
-	depth: number;
+  m: string;
+  t: HBGlyph[];
+  depth: number;
 }
 
 function onlyUnique(value:any, index:number, self:any) {return self.indexOf(value) === index; }
 
 
 function _arrayBufferToBase64( buffer: ArrayBuffer ) {
-    let binary = "";
-    const bytes = new Uint8Array( buffer );
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode( bytes[ i ] );
-    }
-    return btoa( binary );
+  let binary = "";
+  const bytes = new Uint8Array( buffer );
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode( bytes[ i ] );
+  }
+  return btoa( binary );
 }
 
 function remapClusters(glyphs: HBGlyph[], clustermap: number[]) {
-    // We want cluster IDs to be sequential,
-    // not based on UTF8 offset
-    glyphs.forEach( (glyph: HBGlyph, ix:number) => {
-        if (!glyph.offset) { glyph.offset = glyph.cl; }
-        if (clustermap.indexOf(glyph.offset) === -1) {
-            clustermap.push(glyph.offset);
-        }
-        glyph.cl = clustermap.indexOf(glyph.offset);
-    });
+  // We want cluster IDs to be sequential,
+  // not based on UTF8 offset
+  glyphs.forEach( (glyph: HBGlyph, ix:number) => {
+    if (!glyph.offset) { glyph.offset = glyph.cl; }
+    if (clustermap.indexOf(glyph.offset) === -1) {
+      clustermap.push(glyph.offset);
+    }
+    glyph.cl = clustermap.indexOf(glyph.offset);
+  });
 }
 
 export class CrowbarFont {
-	name:   string;
+  name:   string;
   base64?: string;
   fontFace?: string;
   hbFont?: any;
   otFont?: Font;
 
   constructor(name : string, fontBlob?: ArrayBuffer) {
-      this.name = name;
-      if (fontBlob) {
-	    this.base64 = "data:application/octet-stream;base64,"+_arrayBufferToBase64(fontBlob);
-	    this.fontFace = "@font-face{font-family:\"" + name + "\"; src:url(" + this.base64 + ");}";
+    this.name = name;
+    if (fontBlob) {
+	    this.base64 = `data:application/octet-stream;base64,${_arrayBufferToBase64(fontBlob)}`;
+	    this.fontFace = `@font-face{font-family:"${  name  }"; src:url(${  this.base64  });}`;
 	    const hbjs = window["hbjs"];
 	    const blob = hbjs.createBlob(fontBlob);
 	    const face = hbjs.createFace(blob, 0);
 	    this.hbFont = hbjs.createFont(face);
-      }
-      return this;
+    }
+    return this;
   }
 
   initOT(cb: any) {
   	const that = this;
-      load(this.base64 as string, function(err, otFont) {
+    load(this.base64 as string, function (err, otFont) {
     	that.otFont = otFont;
     	cb(that);
-      });
+    });
   }
 
   getSVG(gid: number): any {
-      const hbjs = window["hbjs"];
-      let svgText = hbjs.glyphToSvg(this.hbFont, gid);
-      if (svgText.length < 100) {
-          const glyph = this.getGlyph(gid);
-          if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
-          svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
-      }
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(svgText, "image/svg+xml");
-      return doc.documentElement;
+    const hbjs = window["hbjs"];
+    let svgText = hbjs.glyphToSvg(this.hbFont, gid);
+    if (svgText.length < 100) {
+      const glyph = this.getGlyph(gid);
+      if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
+      svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
+    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, "image/svg+xml");
+    return doc.documentElement;
   }
 
   shapeTrace(s: string, features: any, clusterLevel: number, stopAt=0, stopPhase=0): StageMessage[] {
-      const hbjs = window["hbjs"];
-      const featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(",");
-      const font = this.hbFont;
+    const hbjs = window["hbjs"];
+    const featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(",");
+    const font = this.hbFont;
 	  const buffer = hbjs.createBuffer();
 	  buffer.setClusterLevel(clusterLevel);
 	  buffer.addText(s);
 	  buffer.guessSegmentProperties();
 	  const preshape = buffer.json();
 
-	  const result: StageMessage[] = buffer.shapeWithTrace(font,featurestring, stopAt, stopPhase);
+	  const result: StageMessage[] = buffer.shapeWithTrace(font, featurestring, stopAt, stopPhase);
 	  result.unshift({ m: "Start of shaping", t: preshape, depth: 0 });
-      const clustermap: number[] = [];
+    const clustermap: number[] = [];
 
 	  // Set depths
 	  let depth = 0;
@@ -137,56 +137,56 @@ export class CrowbarFont {
 	  	}
 	  }
 
-      return newResult;
+    return newResult;
   }
 
   getGlyph(gid:number) :Glyph|null {
-      if (!this.otFont) { return null; }
-      return this.otFont.glyphs.get(gid);
+    if (!this.otFont) { return null; }
+    return this.otFont.glyphs.get(gid);
   }
 
   gsubFeatureTags() :string[] {
-      if (!this.otFont) { return []; }
-      if (!this.otFont.tables.gsub) { return []; }
-      return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique);
+    if (!this.otFont) { return []; }
+    if (!this.otFont.tables.gsub) { return []; }
+    return this.otFont.tables.gsub.features.map( (x:any) => x.tag ).filter(onlyUnique);
   }
 
   gposFeatureTags() :string[] {
-      if (!this.otFont) { return []; }
-      if (!this.otFont.tables.gpos) { return []; }
-      return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique);
+    if (!this.otFont) { return []; }
+    if (!this.otFont.tables.gpos) { return []; }
+    return this.otFont.tables.gpos.features.map( (x:any) => x.tag ).filter(onlyUnique);
   }
 
   allFeatureTags() :string[] {
-      return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(onlyUnique);
+    return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(onlyUnique);
   }
 
   getFeatureForIndex(ix:number, stage:string) {
-      let features;
-      if (!this.otFont) { return ""; }
-      if (stage === "GSUB") {
-          features = this.otFont.tables.gsub.features;
-      } else {
-          features = this.otFont.tables.gpos.features;
-      }
-      const featuremap = [];
-      for (const f of features.filter(onlyUnique)) {
-          var li: number;
-          for (li of f.feature.lookupListIndexes) { featuremap[li] = f.tag; }
-      }
-      return featuremap[ix];
+    let features;
+    if (!this.otFont) { return ""; }
+    if (stage === "GSUB") {
+      features = this.otFont.tables.gsub.features;
+    } else {
+      features = this.otFont.tables.gpos.features;
+    }
+    const featuremap = [];
+    for (const f of features.filter(onlyUnique)) {
+      var li: number;
+      for (li of f.feature.lookupListIndexes) { featuremap[li] = f.tag; }
+    }
+    return featuremap[ix];
   }
 
   getGlyphClass(ix:number): number {
-      // Requires my crowbar branch of opentype.js
-      if (!this.otFont) { return 0; }
-      if (!this.otFont.tables.gdef) { return 0; }
-      // Types are wrong
-      // @ts-ignore
-      return this.otFont.position.getGlyphClass(
-          this.otFont.tables.gdef.classDef,
-          ix
-      );
+    // Requires my crowbar branch of opentype.js
+    if (!this.otFont) { return 0; }
+    if (!this.otFont.tables.gdef) { return 0; }
+    // Types are wrong
+    // @ts-ignore
+    return this.otFont.position.getGlyphClass(
+      this.otFont.tables.gdef.classDef,
+      ix
+    );
   }
 
 }
