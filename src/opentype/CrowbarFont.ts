@@ -74,12 +74,14 @@ export class CrowbarFont {
 
   getSVG(gid: number): any {
     const hbjs = window["hbjs"];
-    let svgText = hbjs.glyphToSvg(this.hbFont, gid);
-    if (svgText.length < 100) {
+    let svgText = this.hbFont.glyphToPath(gid);
+    if (svgText.length < 10) {
       const glyph = this.getGlyph(gid);
       if (glyph) { svgText = (glyph.path as Path).toSVG(2); }
-      svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
+    } else {
+      svgText = `<path d="${svgText}"/>`
     }
+    svgText=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">${svgText} </svg>`;
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgText, "image/svg+xml");
     return doc.documentElement;
@@ -95,7 +97,7 @@ export class CrowbarFont {
 	  buffer.guessSegmentProperties();
 	  const preshape = buffer.json();
 
-	  const result: StageMessage[] = buffer.shapeWithTrace(font, featurestring, stopAt, stopPhase);
+	  const result: StageMessage[] = hbjs.shapeWithTrace(font, buffer, featurestring, stopAt, stopPhase);
 	  result.unshift({ m: "Start of shaping", t: preshape, depth: 0 });
     const clustermap: number[] = [];
 
