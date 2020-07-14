@@ -24,7 +24,9 @@ export interface ShapingOptions {
   clusterLevel: number,
   stopAt: number,
   stopPhase: number,
-  direction: string
+  direction: string,
+  script: string,
+  language: string
 }
 
 function onlyUnique(value:any, index:number, self:any) {return self.indexOf(value) === index; }
@@ -102,9 +104,17 @@ export class CrowbarFont {
 	  buffer.setClusterLevel(options.clusterLevel);
 	  buffer.addText(s);
 	  buffer.guessSegmentProperties();
+    console.log(options)
     if (options.direction !== "auto") {
       buffer.setDirection(options.direction);
     }
+    if (options.script !== "") {
+      buffer.setScript(options.script)
+    }
+    if (options.language !== "") {
+      buffer.setLanguage(options.language)
+    }
+
 	  const preshape = buffer.json();
 
 	  const result: StageMessage[] = hbjs.shapeWithTrace(font, buffer, featurestring, options.stopAt, options.stopPhase);

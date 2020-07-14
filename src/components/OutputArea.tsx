@@ -25,7 +25,9 @@ const mapStateToProps = (state:CrowbarState) => {
   return {font, text,
     features: state.features,
     clusterLevel: state.clusterLevel,
-    direction: state.direction
+    direction: state.direction,
+    script: state.script,
+    language: state.language
   };
 };
 
@@ -118,11 +120,9 @@ const OutputArea = (props: PropsFromRedux) => {
   const doPartialTrace = (lookup: number, phase: number) => {
     console.log("Shaping up to ", lookup, phase);
     var options :ShapingOptions = {
-       features: props.features,
-       clusterLevel: props.clusterLevel,
-       stopAt: lookup,
-       stopPhase: phase,
-       direction: props.direction
+      ...props,
+      stopAt: lookup,
+      stopPhase: phase,
     }
     const shaping = props.font.shapeTrace(props.text, options);
     setGlyphStringToBeDrawn(shaping[shaping.length-1].t);
@@ -208,9 +208,7 @@ const OutputArea = (props: PropsFromRedux) => {
 
   if (props.font && props.font.hbFont && props.text) {
     const shaping = props.font.shapeTrace(props.text, {
-      features: props.features,
-      clusterLevel: props.clusterLevel,
-      direction: props.direction,
+      ...props,
       stopAt: 0,
       stopPhase: 0
     });

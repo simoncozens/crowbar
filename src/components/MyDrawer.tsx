@@ -12,9 +12,13 @@ import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
-import { changedDrawerState, changedDirection, changedFeatureState, changedClusterLevel, CrowbarState } from "../store/actions";
+import { changedDrawerState, changedDirection, changedScript, changedLanguage,
+  changedFeatureState, changedClusterLevel, CrowbarState } from "../store/actions";
 import {CrowbarFont } from "../opentype/CrowbarFont";
 import {useStyles } from "../navbarstyles";
+import {harfbuzzScripts, opentypeLanguages } from "../opentype/constants";
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const mapStateToProps = (state:CrowbarState) => {
   return { open: state.drawerOpen,
@@ -22,11 +26,13 @@ const mapStateToProps = (state:CrowbarState) => {
     selectedFontIndex: state.selected_font,
     featureState: state.features,
     clusterLevel: state.clusterLevel,
-    direction: state.direction
+    direction: state.direction,
+    script: state.script,
+    language: state.language,
   };
 };
 
-const connector = connect(mapStateToProps, {changedDirection, changedDrawerState, changedFeatureState, changedClusterLevel});
+const connector = connect(mapStateToProps, {changedDirection, changedScript, changedLanguage, changedDrawerState, changedFeatureState, changedClusterLevel});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const MyDrawer = (props: PropsFromRedux) => {
@@ -88,7 +94,22 @@ const MyDrawer = (props: PropsFromRedux) => {
           <MenuItem value={"ttb"}>Top to bottom</MenuItem>
         </Select>
       </FormControl>
+      <Divider />
 
+      <Autocomplete
+        id="script"
+        options={harfbuzzScripts}
+        getOptionLabel={(option) => option.label}
+        onChange={(e,v) => props.changedScript(v ? v.tag : "")}
+        renderInput={(params) => <TextField {...params} label="Script" variant="outlined" />}
+      />
+      <Autocomplete
+        id="language"
+        options={opentypeLanguages}
+        getOptionLabel={(option) => option.label}
+        onChange={(e,v) => props.changedLanguage(v ? v.tag : "")}
+        renderInput={(params) => <TextField {...params} label="Language" variant="outlined" />}
+      />
       <Divider />
       {features}
       <Divider />

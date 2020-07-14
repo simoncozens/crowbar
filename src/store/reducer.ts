@@ -3,6 +3,8 @@ import { ADDED_FONT,
   CHANGED_FONT,
   CHANGED_DRAWER_STATE,
   CHANGED_DIRECTION,
+  CHANGED_SCRIPT,
+  CHANGED_LANGUAGE,
   CHANGED_FEATURE_STATE,
   CHANGED_CLUSTER_LEVEL,
   initialState } from "./actions";
@@ -17,6 +19,10 @@ export default function appReducer(state = initialState, action: any) {
       return { ...state, clusterLevel: action.clusterLevel};
     case CHANGED_DIRECTION:
       return { ...state, direction: action.direction};
+    case CHANGED_SCRIPT:
+      return { ...state, script: action.script};
+    case CHANGED_LANGUAGE:
+      return { ...state, language: action.language};
     case CHANGED_DRAWER_STATE:
       console.log("Changed drawer state", action.open);
       return { ...state, drawerOpen: action.open};
