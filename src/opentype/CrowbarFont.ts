@@ -19,6 +19,14 @@ export interface StageMessage {
   depth: number;
 }
 
+export interface ShapingOptions {
+  features: any,
+  clusterLevel: number,
+  stopAt: number,
+  stopPhase: number,
+  direction: string
+}
+
 function onlyUnique(value:any, index:number, self:any) {return self.indexOf(value) === index; }
 
 
@@ -73,7 +81,6 @@ export class CrowbarFont {
   }
 
   getSVG(gid: number): any {
-    const hbjs = window["hbjs"];
     let svgText = this.hbFont.glyphToPath(gid);
     if (svgText.length < 10) {
       const glyph = this.getGlyph(gid);
@@ -87,17 +94,20 @@ export class CrowbarFont {
     return doc.documentElement;
   }
 
-  shapeTrace(s: string, features: any, clusterLevel: number, stopAt=0, stopPhase=0): StageMessage[] {
+  shapeTrace(s: string, options:ShapingOptions): StageMessage[] {
     const hbjs = window["hbjs"];
-    const featurestring = Object.keys(features).map( (f) => (features[f]?"+":"-")+f).join(",");
+    const featurestring = Object.keys(options.features).map( (f) => (options.features[f]?"+":"-")+f).join(",");
     const font = this.hbFont;
 	  const buffer = hbjs.createBuffer();
-	  buffer.setClusterLevel(clusterLevel);
+	  buffer.setClusterLevel(options.clusterLevel);
 	  buffer.addText(s);
 	  buffer.guessSegmentProperties();
+    if (options.direction !== "auto") {
+      buffer.setDirection(options.direction);
+    }
 	  const preshape = buffer.json();
 
-	  const result: StageMessage[] = hbjs.shapeWithTrace(font, buffer, featurestring, stopAt, stopPhase);
+	  const result: StageMessage[] = hbjs.shapeWithTrace(font, buffer, featurestring, options.stopAt, options.stopPhase);
 	  result.unshift({ m: "Start of shaping", t: preshape, depth: 0 });
     const clustermap: number[] = [];
 

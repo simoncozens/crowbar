@@ -12,7 +12,7 @@ import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
-import { changedDrawerState, changedFeatureState, changedClusterLevel, CrowbarState } from "../store/actions";
+import { changedDrawerState, changedDirection, changedFeatureState, changedClusterLevel, CrowbarState } from "../store/actions";
 import {CrowbarFont } from "../opentype/CrowbarFont";
 import {useStyles } from "../navbarstyles";
 
@@ -21,11 +21,12 @@ const mapStateToProps = (state:CrowbarState) => {
     fonts: state.fonts,
     selectedFontIndex: state.selected_font,
     featureState: state.features,
-    clusterLevel: state.clusterLevel
+    clusterLevel: state.clusterLevel,
+    direction: state.direction
   };
 };
 
-const connector = connect(mapStateToProps, {changedDrawerState, changedFeatureState, changedClusterLevel});
+const connector = connect(mapStateToProps, {changedDirection, changedDrawerState, changedFeatureState, changedClusterLevel});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const MyDrawer = (props: PropsFromRedux) => {
@@ -72,6 +73,22 @@ const MyDrawer = (props: PropsFromRedux) => {
           {theme.direction === "rtl" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </IconButton>
       </div>
+
+      <FormControl className={classes.formControl}>
+        <InputLabel id="direction-label">Direction</InputLabel>
+        <Select
+          labelId="direction-label"
+          id="direction"
+          value={props.direction}
+          onChange={(e) => props.changedDirection(e.target.value as string)}
+        >
+          <MenuItem value={"auto"}>Automatically detect</MenuItem>
+          <MenuItem value={"ltr"}>Left to right</MenuItem>
+          <MenuItem value={"rtl"}>Right to left</MenuItem>
+          <MenuItem value={"ttb"}>Top to bottom</MenuItem>
+        </Select>
+      </FormControl>
+
       <Divider />
       {features}
       <Divider />

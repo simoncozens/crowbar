@@ -16,13 +16,17 @@ import { diff, Diff, DiffEdit } from "deep-diff";
 import SubdirectoryArrowRightIcon from "@material-ui/icons/SubdirectoryArrowRight";
 import {paletteFor} from "../palette";
 import {SVGArea} from "./SVGArea";
-import {CrowbarFont, StageMessage, HBGlyph} from "../opentype/CrowbarFont";
+import { ShapingOptions, CrowbarFont, StageMessage, HBGlyph} from "../opentype/CrowbarFont";
 import { CrowbarState } from "../store/actions";
 
 const mapStateToProps = (state:CrowbarState) => {
   const font: CrowbarFont = state.fonts[state.selected_font];
   const text: string = state.inputtext;
-  return {font, text, features: state.features, clusterLevel: state.clusterLevel};
+  return {font, text,
+    features: state.features,
+    clusterLevel: state.clusterLevel,
+    direction: state.direction
+  };
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -113,7 +117,14 @@ const OutputArea = (props: PropsFromRedux) => {
 
   const doPartialTrace = (lookup: number, phase: number) => {
     console.log("Shaping up to ", lookup, phase);
-    const shaping = props.font.shapeTrace(props.text, props.features, props.clusterLevel, lookup, phase);
+    var options :ShapingOptions = {
+       features: props.features,
+       clusterLevel: props.clusterLevel,
+       stopAt: lookup,
+       stopPhase: phase,
+       direction: props.direction
+    }
+    const shaping = props.font.shapeTrace(props.text, options);
     setGlyphStringToBeDrawn(shaping[shaping.length-1].t);
   };
 
@@ -196,7 +207,13 @@ const OutputArea = (props: PropsFromRedux) => {
   };
 
   if (props.font && props.font.hbFont && props.text) {
-    const shaping = props.font.shapeTrace(props.text, props.features, props.clusterLevel);
+    const shaping = props.font.shapeTrace(props.text, {
+      features: props.features,
+      clusterLevel: props.clusterLevel,
+      direction: props.direction,
+      stopAt: 0,
+      stopPhase: 0
+    });
     const fullBuffer = shaping[shaping.length-1].t;
     if (props.text != oldText) {
       setGlyphStringToBeDrawn(fullBuffer);

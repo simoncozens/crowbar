@@ -6,10 +6,16 @@ export const CHANGED_FONT = "CHANGED_FONT";
 export const CHANGED_FEATURE_STATE = "CHANGED_FEATURE_STATE";
 export const CHANGED_DRAWER_STATE = "CHANGED_DRAWER_STATE";
 export const CHANGED_CLUSTER_LEVEL = "CHANGED_CLUSTER_LEVEL";
+export const CHANGED_DIRECTION = "CHANGED_DIRECTION";
 
 export const changedFeatureState = (featureName: string) => ({
   type: CHANGED_FEATURE_STATE,
   feature: featureName
+});
+
+export const changedDirection = (direction: string) => ({
+  type: CHANGED_DIRECTION,
+  direction
 });
 
 export const changedClusterLevel = (content:number) => ({
@@ -63,6 +69,7 @@ export interface CrowbarState {
   drawerOpen: boolean;
   features: any;
   clusterLevel: number;
+  direction: string;
 }
 
 export const initialState: CrowbarState = {
@@ -72,5 +79,6 @@ export const initialState: CrowbarState = {
   inputtext: "",
   drawerOpen: false,
   features: {},
-  clusterLevel: 0
+  clusterLevel: 0,
+  direction: "auto"
 };
