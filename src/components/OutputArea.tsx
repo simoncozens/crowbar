@@ -7,15 +7,13 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowRightIcon from "@material-ui/icons/ArrowRight";
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import { makeStyles } from "@material-ui/core/styles";
 import { diff, Diff, DiffEdit } from "deep-diff";
 import SubdirectoryArrowRightIcon from "@material-ui/icons/SubdirectoryArrowRight";
 import { paletteFor } from "../palette";
 import { SVGArea } from "./SVGArea";
+import { GlyphBox } from "./GlyphBox";
+
 import {
   ShapingOptions,
   CrowbarFont,
@@ -47,49 +45,6 @@ const useStyles = makeStyles((theme) => ({
 const connector = connect(mapStateToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const glyphToHTML = (glyph: HBGlyph, font: CrowbarFont, color: string) => {
-  const fGlyph = font.getGlyph(glyph.g);
-  var baseOrMark = font.getGlyphClass(glyph.g) == 3 ? "markglyph" : "";
-  return (
-    <div
-      className={`glyphbox ${color} ${baseOrMark}`}
-      style={{
-        color: paletteFor(glyph.cl),
-      }}
-    >
-      {fGlyph && fGlyph.name} ({glyph.g})
-      {(glyph.ax || glyph.ay) && (
-        <div>
-          {glyph.ax && (
-            <span>
-              <ArrowForwardIcon /> {glyph.ax}
-            </span>
-          )}
-          {glyph.ay && (
-            <span>
-              <ArrowUpwardIcon /> {glyph.ay}
-            </span>
-          )}
-        </div>
-      )}
-      {(glyph.dx || glyph.dy) && (
-        <div>
-          {glyph.dx && (
-            <span>
-              <ArrowRightIcon /> {glyph.dx}
-            </span>
-          )}
-          {glyph.dy && (
-            <span>
-              <ArrowDropUpIcon /> {glyph.dy}
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
 function processDiffArray(
   diffOutput: Array<Diff<HBGlyph[], HBGlyph[]>>
 ): string[] {
@@ -106,16 +61,27 @@ function processDiffArray(
 }
 
 const OutputArea = (props: PropsFromRedux) => {
-  const [glyphStringToBeDrawn, setGlyphStringToBeDrawn] = useState();
-  const [oldText, setOldText] = useState();
   const [highlightedGlyph, setHighlightedGlyph] = useState(-1);
+  const [glyphStringToBeDrawn, setGlyphStringToBeDrawn] = useState<
+    HBGlyph[] | null
+  >(null);
   const classes = useStyles();
   let stage = "GSUB";
   let lastRow: HBGlyph[] = [];
   let rowid = 0;
 
+  if (!(props.font && props.font.hbFont && props.text)) {
+    return <div />;
+  }
+
+  const shaping = props.font.shapeTrace(props.text, {
+    ...props,
+    stopAt: 0,
+    stopPhase: 0,
+  });
+  const fullBuffer = shaping[shaping.length - 1].t;
+
   const doPartialTrace = (lookup: number, phase: number) => {
-    console.log("Shaping up to ", lookup, phase);
     var options: ShapingOptions = {
       ...props,
       stopAt: lookup,
@@ -189,14 +155,13 @@ const OutputArea = (props: PropsFromRedux) => {
           while (el.tagName != "TR" && el.parentElement) {
             el = el.parentElement;
           }
-          console.log(el);
           const index = parseInt(el.getAttribute("data-lookup") || "") || 0;
           doPartialTrace(
             index,
             el.getAttribute("data-stage") == "GSUB" ? 1 : 2
           );
         }}
-        onMouseLeave={() => setGlyphStringToBeDrawn(fullBuffer)}
+        onMouseLeave={() => setGlyphStringToBeDrawn(null)}
         data-stage={stage}
         data-lookup={ix}
       >
@@ -212,7 +177,7 @@ const OutputArea = (props: PropsFromRedux) => {
               onMouseEnter={() => setHighlightedGlyph(glyph.cl)}
               onMouseLeave={() => setHighlightedGlyph(-1)}
             >
-              {glyphToHTML(glyph, font, diffColors[ix])}
+              <GlyphBox glyph={glyph} font={font} color={diffColors[ix]} />
             </span>
           ))}
         </TableCell>
@@ -220,46 +185,33 @@ const OutputArea = (props: PropsFromRedux) => {
     );
   };
 
-  if (props.font && props.font.hbFont && props.text) {
-    const shaping = props.font.shapeTrace(props.text, {
-      ...props,
-      stopAt: 0,
-      stopPhase: 0,
-    });
-    const fullBuffer = shaping[shaping.length - 1].t;
-    if (props.text != oldText) {
-      setGlyphStringToBeDrawn(fullBuffer);
-      setOldText(props.text);
-    }
-    lastRow = [];
-    return (
-      <div>
-        {shaping[shaping.length - 1] && (
-          <SVGArea
-            highlightedglyph={highlightedGlyph}
-            glyphstring={glyphStringToBeDrawn}
-            font={props.font}
-          />
-        )}
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Stage</TableCell>
-                <TableCell>Glyphs</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {shaping.map((row: StageMessage) =>
-                rowToHTML(row, props.font, fullBuffer)
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-    );
-  }
-  return <div />;
+  lastRow = [];
+  return (
+    <div>
+      {shaping[shaping.length - 1] && (
+        <SVGArea
+          highlightedglyph={highlightedGlyph}
+          glyphstring={glyphStringToBeDrawn || fullBuffer}
+          font={props.font}
+        />
+      )}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Stage</TableCell>
+              <TableCell>Glyphs</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {shaping.map((row: StageMessage) =>
+              rowToHTML(row, props.font, fullBuffer)
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
 };
 
 export default connector(OutputArea);
