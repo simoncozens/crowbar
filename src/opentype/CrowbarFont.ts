@@ -135,8 +135,6 @@ export class CrowbarFont {
       options.stopAt,
       options.stopPhase
     );
-    console.log("Bare result:");
-    console.log(result);
     result.unshift({ m: "Start of shaping", t: preshape, depth: 0 });
     const clustermap: number[] = [];
 
@@ -172,6 +170,7 @@ export class CrowbarFont {
       }
     });
     const endbuffer = buffer.json();
+    buffer.destroy();
     remapClusters(endbuffer, clustermap);
     newResult.push({ m: "End of shaping", t: endbuffer, depth: 0 });
     for (const r of newResult) {
