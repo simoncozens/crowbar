@@ -64,6 +64,7 @@ export class CrowbarFont {
   fontFace?: string;
   hbFont?: any;
   otFont?: Font;
+  debugInfo?: any;
 
   constructor(name: string, fontBlob?: ArrayBuffer) {
     this.name = name;
@@ -76,6 +77,11 @@ export class CrowbarFont {
       const blob = hbjs.createBlob(fontBlob);
       const face = hbjs.createFace(blob, 0);
       this.hbFont = hbjs.createFont(face);
+      const debgTable = face.reference_table("Debg");
+      if (debgTable) {
+        this.debugInfo = JSON.parse(new TextDecoder("utf8").decode(debgTable));
+        this.debugInfo = this.debugInfo["com.github.fonttools.feaLib"];
+      }
     }
     return this;
   }
@@ -228,6 +234,20 @@ export class CrowbarFont {
     return [...this.gsubFeatureTags(), ...this.gposFeatureTags()].filter(
       onlyUnique
     );
+  }
+
+  getDebugInfo(ix: number, stage: string) {
+    if (this.debugInfo && this.debugInfo[stage] && this.debugInfo[stage][ix]) {
+      const debugData = this.debugInfo[stage][ix];
+      var featureInfo = debugData[2];
+      return {
+        source: debugData[0],
+        name: debugData[1],
+        script: debugData[2] && debugData[2][0],
+        language: debugData[2] && debugData[2][1],
+        feature: debugData[2] && debugData[2][2],
+      };
+    }
   }
 
   getFeatureForIndex(ix: number, stage: string) {

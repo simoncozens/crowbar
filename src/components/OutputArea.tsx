@@ -141,10 +141,12 @@ const OutputArea = (props: PropsFromRedux) => {
     }
     const m2 = row.m.match(/lookup (\d+)/);
     let featurename = "";
+    let debugInfo = null;
     let ix = 0;
     if (m2) {
       ix = parseInt(m2[1]);
       featurename = font.getFeatureForIndex(ix, stage);
+      debugInfo = font.getDebugInfo(ix, stage);
     }
     lastRow = row.t;
     return (
@@ -170,6 +172,9 @@ const OutputArea = (props: PropsFromRedux) => {
           {row.m}
           {featurename && <br />}
           {featurename && <b>{featurename}</b>}
+          {debugInfo && <br />}
+          {debugInfo && `${debugInfo.source} : `}
+          {debugInfo && <b>{debugInfo.name}</b>}
         </TableCell>
         <TableCell>
           {row.t.map((glyph: HBGlyph, ix: number) => (
