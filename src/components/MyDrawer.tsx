@@ -72,6 +72,22 @@ const MyDrawer = (props: PropsFromRedux) => {
       ? 1
       : a.label.localeCompare(b.label);
   };
+  const sortScripts = function (
+    a: Record<"label" | "tag", string>,
+    b: Record<"label" | "tag", string>
+  ) {
+    if (!font) {
+      return a.label.localeCompare(b.label);
+    }
+    return font.supportedScripts.has(a.tag.toLowerCase()) &&
+      !font.supportedScripts.has(b.tag.toLowerCase())
+      ? -1
+      : font.supportedScripts.has(b.tag.toLowerCase()) &&
+        !font.supportedScripts.has(a.tag.toLowerCase())
+      ? 1
+      : a.label.localeCompare(b.label);
+  };
+
   let features;
   if (font) {
     features = (
@@ -137,7 +153,15 @@ const MyDrawer = (props: PropsFromRedux) => {
 
       <Autocomplete
         id="script"
-        options={harfbuzzScripts}
+        options={harfbuzzScripts.sort(sortScripts)}
+        renderOption={(option) => (
+          <React.Fragment>
+            <span className={classes.flag}>
+              {font.supportedScripts.has(option.tag.toLowerCase()) ? "✅" : " "}
+            </span>
+            {option.label}
+          </React.Fragment>
+        )}
         getOptionLabel={(option) => option.label}
         onChange={(e, v) => props.changedScript(v ? v.tag : "")}
         renderInput={(params) => (
