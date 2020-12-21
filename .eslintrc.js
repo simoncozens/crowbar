@@ -1,18 +1,20 @@
 module.exports = {
-  "extends": [
+  extends: [
     "react-app",
-    "airbnb",
     "plugin:jsx-a11y/recommended",
     "airbnb-typescript",
-    "prettier"
+    "prettier",
   ],
-  "plugins": [
-    "jsx-a11y",
-    "prettier"
-  ],
-  "rules": {
-    "quotes": "off",
+  plugins: ["jsx-a11y", "prettier"],
+  rules: {
+    quotes: "off",
     "@typescript-eslint/quotes": ["error", "double"],
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
-  }
-}
+    "react/jsx-filename-extension": [
+      1,
+      { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+    ],
+  },
+  parserOptions: {
+    project: "./tsconfig.json",
+  },
+};
