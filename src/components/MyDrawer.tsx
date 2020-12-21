@@ -6,6 +6,8 @@ import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CancelIcon from "@material-ui/icons/Cancel";
 import IconButton from "@material-ui/core/IconButton";
 import Chip from "@material-ui/core/Chip";
 import Select from "@material-ui/core/Select";
@@ -106,6 +108,15 @@ const MyDrawer = (props: PropsFromRedux) => {
                   : props.featureState[x]
                   ? "primary"
                   : "secondary"
+              }
+              icon={
+                !(x in props.featureState) ? (
+                  <span />
+                ) : props.featureState[x] ? (
+                  <CheckCircleIcon />
+                ) : (
+                  <CancelIcon />
+                )
               }
               label={x}
             />
