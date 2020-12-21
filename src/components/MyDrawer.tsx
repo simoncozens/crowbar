@@ -12,16 +12,24 @@ import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
-import { changedDrawerState, changedDirection, changedScript, changedLanguage,
-  changedFeatureState, changedClusterLevel, CrowbarState } from "../store/actions";
-import {CrowbarFont } from "../opentype/CrowbarFont";
-import {useStyles } from "../navbarstyles";
-import {harfbuzzScripts, opentypeLanguages } from "../opentype/constants";
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import {
+  changedDrawerState,
+  changedDirection,
+  changedScript,
+  changedLanguage,
+  changedFeatureState,
+  changedClusterLevel,
+  CrowbarState,
+} from "../store/actions";
+import { CrowbarFont } from "../opentype/CrowbarFont";
+import { useStyles } from "../navbarstyles";
+import { harfbuzzScripts, opentypeLanguages } from "../opentype/constants";
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
-const mapStateToProps = (state:CrowbarState) => {
-  return { open: state.drawerOpen,
+const mapStateToProps = (state: CrowbarState) => {
+  return {
+    open: state.drawerOpen,
     fonts: state.fonts,
     selectedFontIndex: state.selected_font,
     featureState: state.features,
@@ -32,33 +40,60 @@ const mapStateToProps = (state:CrowbarState) => {
   };
 };
 
-const connector = connect(mapStateToProps, {changedDirection, changedScript, changedLanguage, changedDrawerState, changedFeatureState, changedClusterLevel});
+const connector = connect(mapStateToProps, {
+  changedDirection,
+  changedScript,
+  changedLanguage,
+  changedDrawerState,
+  changedFeatureState,
+  changedClusterLevel,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const MyDrawer = (props: PropsFromRedux) => {
   const theme = useTheme();
   const classes = useStyles();
-  const handleDrawerClose = () => { props.changedDrawerState(false); };
+  const handleDrawerClose = () => {
+    props.changedDrawerState(false);
+  };
   const font: CrowbarFont = props.fonts[props.selectedFontIndex];
+  const sortLanguages = function (
+    a: Record<"label" | "tag", string>,
+    b: Record<"label" | "tag", string>
+  ) {
+    if (!font) {
+      return a.label.localeCompare(b.label);
+    }
+    return font.supportedLanguages.has(a.tag) &&
+      !font.supportedLanguages.has(b.tag)
+      ? -1
+      : font.supportedLanguages.has(b.tag) &&
+        !font.supportedLanguages.has(a.tag)
+      ? 1
+      : a.label.localeCompare(b.label);
+  };
   let features;
   if (font) {
     features = (
       <div>
         <h2 className={classes.smallspace}>Features</h2>
         <div className={classes.chipArray}>
-          { font.allFeatureTags().map( (x) => (
+          {font.allFeatureTags().map((x) => (
             <Chip
               key={x}
-              onClick={() => { props.changedFeatureState(x); }}
+              onClick={() => {
+                props.changedFeatureState(x);
+              }}
               color={
-                        (!(x in props.featureState) ? "default"
-                          : (props.featureState[x] ? "primary" : "secondary"
-                          ))
-                    }
+                !(x in props.featureState)
+                  ? "default"
+                  : props.featureState[x]
+                  ? "primary"
+                  : "secondary"
+              }
               label={x}
             />
-          )
-          ) }
+          ))}
         </div>
       </div>
     );
@@ -76,7 +111,11 @@ const MyDrawer = (props: PropsFromRedux) => {
     >
       <div className={classes.drawerHeader}>
         <IconButton onClick={handleDrawerClose}>
-          {theme.direction === "rtl" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          {theme.direction === "rtl" ? (
+            <ChevronLeftIcon />
+          ) : (
+            <ChevronRightIcon />
+          )}
         </IconButton>
       </div>
 
@@ -100,15 +139,27 @@ const MyDrawer = (props: PropsFromRedux) => {
         id="script"
         options={harfbuzzScripts}
         getOptionLabel={(option) => option.label}
-        onChange={(e,v) => props.changedScript(v ? v.tag : "")}
-        renderInput={(params) => <TextField {...params} label="Script" variant="outlined" />}
+        onChange={(e, v) => props.changedScript(v ? v.tag : "")}
+        renderInput={(params) => (
+          <TextField {...params} label="Script" variant="outlined" />
+        )}
       />
       <Autocomplete
         id="language"
-        options={opentypeLanguages}
+        options={opentypeLanguages.sort(sortLanguages)}
+        renderOption={(option) => (
+          <React.Fragment>
+            <span className={classes.flag}>
+              {font.supportedLanguages.has(option.tag) ? "✅" : " "}
+            </span>
+            {option.label}
+          </React.Fragment>
+        )}
         getOptionLabel={(option) => option.label}
-        onChange={(e,v) => props.changedLanguage(v ? v.tag : "")}
-        renderInput={(params) => <TextField {...params} label="Language" variant="outlined" />}
+        onChange={(e, v) => props.changedLanguage(v ? v.tag : "")}
+        renderInput={(params) => (
+          <TextField {...params} label="Language" variant="outlined" />
+        )}
       />
       <Divider />
       {features}
@@ -127,10 +178,8 @@ const MyDrawer = (props: PropsFromRedux) => {
           <MenuItem value={2}>Characters</MenuItem>
         </Select>
       </FormControl>
-
     </Drawer>
   );
-
 };
 
 export default connector(MyDrawer);

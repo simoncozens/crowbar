@@ -21,19 +21,22 @@ export const useStyles = makeStyles((theme) => ({
     marginRight: drawerWidth,
   },
   dragging: {
-    backgroundColor: theme.palette.info.light
+    backgroundColor: theme.palette.info.light,
   },
   grow: {
     flexGrow: 1,
   },
   smallspace: {
-    padding: theme.spacing(2)
+    padding: theme.spacing(2),
   },
   tinyspace: {
-    padding: theme.spacing(1)
+    padding: theme.spacing(1),
   },
   hide: {
     display: "none",
+  },
+  flag: {
+    width: "30px",
   },
   drawer: {
     width: drawerWidth,
