@@ -24,6 +24,7 @@ export interface StageMessage {
 
 export interface ShapingOptions {
   features: any;
+  featureString?: string;
   clusterLevel: number;
   stopAt: number;
   stopPhase: number;
@@ -138,9 +139,11 @@ export class CrowbarFont {
 
   shapeTrace(s: string, options: ShapingOptions): StageMessage[] {
     const { hbjs } = window;
-    const featurestring = Object.keys(options.features)
-      .map((f) => (options.features[f] ? "+" : "-") + f)
-      .join(",");
+    const featurestring =
+      options.featureString ||
+      Object.keys(options.features)
+        .map((f) => (options.features[f] ? "+" : "-") + f)
+        .join(",");
     const font = this.hbFont;
     const buffer = hbjs.createBuffer();
     buffer.setClusterLevel(options.clusterLevel);
@@ -221,7 +224,6 @@ export class CrowbarFont {
         }
       });
     });
-
     return newResult;
   }
 

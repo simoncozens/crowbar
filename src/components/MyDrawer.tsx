@@ -24,6 +24,7 @@ import {
   changedLanguage,
   changedFeatureState,
   changedClusterLevel,
+  changedFeatureString,
   CrowbarState,
 } from "../store/actions";
 import { CrowbarFont } from "../opentype/CrowbarFont";
@@ -35,6 +36,7 @@ const mapStateToProps = (state: CrowbarState) => ({
   fonts: state.fonts,
   selectedFontIndex: state.selected_font,
   featureState: state.features,
+  featureString: state.featureString,
   clusterLevel: state.clusterLevel,
   direction: state.direction,
   script: state.script,
@@ -48,6 +50,7 @@ const connector = connect(mapStateToProps, {
   changedDrawerState,
   changedFeatureState,
   changedClusterLevel,
+  changedFeatureString,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -124,19 +127,28 @@ const MyDrawer = (props: PropsFromRedux) => {
     features = (
       <div>
         <h2 className={classes.smallspace}>Features</h2>
-        <div className={classes.chipArray}>
-          {font.allFeatureTags().map((x) => (
-            <Chip
-              key={x}
-              onClick={() => {
-                props.changedFeatureState(x);
-              }}
-              color={featureStateColor(x)}
-              icon={featureStateIcon(x)}
-              label={x}
-            />
-          ))}
-        </div>
+        <TextField
+          id="featurestring"
+          label="Features"
+          onChange={(e) => {
+            props.changedFeatureString(e.target.value);
+          }}
+        />
+        {!props.featureString && (
+          <div className={classes.chipArray}>
+            {font.allFeatureTags().map((x) => (
+              <Chip
+                key={x}
+                onClick={() => {
+                  props.changedFeatureState(x);
+                }}
+                color={featureStateColor(x)}
+                icon={featureStateIcon(x)}
+                label={x}
+              />
+            ))}
+          </div>
+        )}
       </div>
     );
   }

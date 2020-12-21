@@ -7,6 +7,7 @@ import {
   CHANGED_SCRIPT,
   CHANGED_LANGUAGE,
   CHANGED_FEATURE_STATE,
+  CHANGED_FEATURE_STRING,
   CHANGED_CLUSTER_LEVEL,
   initialState,
 } from "./actions";
@@ -34,6 +35,8 @@ export default function appReducer(state = initialState, action: any) {
         fonts: [...state.fonts, action.added_font],
         selected_font: state.fonts.length,
       };
+    case CHANGED_FEATURE_STRING:
+      return { ...state, featureString: action.featureString };
     case CHANGED_FEATURE_STATE:
       if (!(action.feature in features)) {
         features[action.feature] = true;
