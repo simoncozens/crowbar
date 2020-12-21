@@ -1,21 +1,21 @@
 function hbjs(instance) {
-  'use strict';
+  "use strict";
 
   var exports = instance.exports;
   var heapu8 = new Uint8Array(exports.memory.buffer);
   var heapu32 = new Uint32Array(exports.memory.buffer);
   var heapi32 = new Int32Array(exports.memory.buffer);
-  var utf8Decoder = new TextDecoder('utf8');
+  var utf8Decoder = new TextDecoder("utf8");
 
   var HB_MEMORY_MODE_WRITABLE = 2;
 
-  function hb_tag (s) {
+  function hb_tag(s) {
     return (
-      ( s.charCodeAt(0) & 0xFF ) << 24 |
-      ( s.charCodeAt(1) & 0xFF ) << 16 |
-      ( s.charCodeAt(2) & 0xFF ) << 8  |
-      ( s.charCodeAt(3) & 0xFF ) << 0
-    )
+      ((s.charCodeAt(0) & 0xff) << 24) |
+      ((s.charCodeAt(1) & 0xff) << 16) |
+      ((s.charCodeAt(2) & 0xff) << 8) |
+      ((s.charCodeAt(3) & 0xff) << 0)
+    );
   }
 
   /**
@@ -57,13 +57,15 @@ function hbjs(instance) {
        * Return the binary contents of an OpenType table.
        * @param {string} table Table name
        */
-      reference_table: function(table) {
+      reference_table: function (table) {
         var blob = exports.hb_face_reference_table(ptr, hb_tag(table));
         var length = exports.hb_blob_get_length(blob);
-        if (!length) { return; }
-        var lengthptr =  exports.malloc(4);
+        if (!length) {
+          return;
+        }
+        var lengthptr = exports.malloc(4);
         var blobptr = exports.hb_blob_get_data(blob, lengthptr);
-        var table_string = heapu8.subarray(blobptr, blobptr+length);
+        var table_string = heapu8.subarray(blobptr, blobptr + length);
         return table_string;
       },
       /**
@@ -103,7 +105,7 @@ function hbjs(instance) {
         ? utf8Decoder.decode(
             heapu8.subarray(pathBuffer, pathBuffer + svgLength)
           )
-        : '';
+        : "";
     }
 
     function glyphName(glyphId) {
@@ -114,12 +116,12 @@ function hbjs(instance) {
         nameBufferSize
       );
       if (!ok) {
-        return '';
+        return "";
       }
       var decoded = utf8Decoder.decode(
         heapu8.subarray(nameBuffer, nameBuffer + nameBufferSize)
       );
-      return decoded.replace(/\0.*/, '');
+      return decoded.replace(/\0.*/, "");
     }
 
     return {
@@ -134,8 +136,8 @@ function hbjs(instance) {
       glyphToJson: function (glyphId) {
         var path = glyphToPath(glyphId);
         return path
-          .replace(/([MLQCZ])/g, '|$1 ')
-          .split('|')
+          .replace(/([MLQCZ])/g, "|$1 ")
+          .split("|")
           .filter(function (x) {
             return x.length;
           })
@@ -172,7 +174,7 @@ function hbjs(instance) {
     };
   }
 
-  var utf8Encoder = new TextEncoder('utf8');
+  var utf8Encoder = new TextEncoder("utf8");
   function createCString(text) {
     var bytes = utf8Encoder.encode(text);
     var ptr = exports.malloc(bytes.byteLength);
@@ -337,7 +339,7 @@ function hbjs(instance) {
   */
 
   function shapeWithTrace(font, buffer, features, stop_at, stop_phase) {
-    var bufLen = 1024 * 1024;
+    var bufLen = 10 * 1024 * 1024;
     var traceBuffer = exports.malloc(bufLen);
     var featurestr = createCString(features);
     var traceLen = exports.hbjs_shape_with_trace(
