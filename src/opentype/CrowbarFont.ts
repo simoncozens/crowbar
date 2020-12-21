@@ -65,9 +65,13 @@ export class CrowbarFont {
   hbFont?: any;
   otFont?: Font;
   debugInfo?: any;
+  supportedScripts: Set<string>;
+  supportedLanguages: Set<string>;
 
   constructor(name: string, fontBlob?: ArrayBuffer) {
     this.name = name;
+    this.supportedLanguages = new Set();
+    this.supportedScripts = new Set();
     if (fontBlob) {
       this.base64 = `data:application/octet-stream;base64,${_arrayBufferToBase64(
         fontBlob
@@ -90,6 +94,20 @@ export class CrowbarFont {
     const that = this;
     load(this.base64 as string, function (err, otFont) {
       that.otFont = otFont;
+      if (err) {
+        console.log(err);
+      }
+      if (otFont && otFont.tables.gsub) {
+        otFont.tables.gsub.scripts.forEach((script: any) => {
+          that.supportedScripts.add(script.tag);
+          console.log(script);
+          if (script.script.langSysRecords) {
+            script.script.langSysRecords.forEach((lang: any) => {
+              that.supportedLanguages.add(lang.tag);
+            });
+          }
+        });
+      }
       cb(that);
     });
   }
@@ -120,8 +138,8 @@ export class CrowbarFont {
     buffer.setClusterLevel(options.clusterLevel);
     buffer.addText(s);
     buffer.guessSegmentProperties();
-    console.log(options);
-    console.log(featurestring);
+    // console.log(options);
+    // console.log(featurestring);
     if (options.direction !== "auto") {
       buffer.setDirection(options.direction);
     }
