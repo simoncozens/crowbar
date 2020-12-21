@@ -96,6 +96,7 @@ const OutputArea = (props: PropsFromRedux) => {
     font: CrowbarFont,
     fullBuffer: HBGlyph[]
   ) => {
+    // console.log(row.m, row.t);
     var m = row.m.match(/Start of shaping/);
     if (m) {
       return props.clusterLevel == 2 ? (
@@ -117,6 +118,22 @@ const OutputArea = (props: PropsFromRedux) => {
         </TableRow>
       ) : (
         <div />
+      );
+    }
+    var m = row.m.match(/(start|end).*(normalize|preprocess)/);
+    if (m && row.t[0]) {
+      return (
+        <TableRow key={rowid++}>
+          <TableCell> {row.m} </TableCell>
+          <TableCell>
+            {row.t.map((glyph) => (
+              <div className="glyphbox">
+                U+
+                {glyph.g.toString(16).padStart(4, "0")}
+              </div>
+            ))}
+          </TableCell>
+        </TableRow>
       );
     }
     var m = row.m.match(/start table (....)/);
