@@ -1,6 +1,7 @@
 {
   "name": "crowbar",
-  "version": "0.1.0",
+  "homepage": "/crowbar/",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.2",
