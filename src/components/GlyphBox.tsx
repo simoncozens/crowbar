@@ -6,7 +6,7 @@ import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import { CrowbarFont, HBGlyph } from "../opentype/CrowbarFont";
 import { paletteFor } from "../palette";
 
-type GlyphBoxProps = {
+export type GlyphBoxProps = {
   glyph: HBGlyph;
   font: CrowbarFont;
   color: string;
@@ -14,7 +14,7 @@ type GlyphBoxProps = {
 
 export const GlyphBox = ({ glyph, font, color }: GlyphBoxProps) => {
   const fGlyph = font.getGlyph(glyph.g);
-  var baseOrMark = font.getGlyphClass(glyph.g) == 3 ? "markglyph" : "";
+  const baseOrMark = font.getGlyphClass(glyph.g) === 3 ? "markglyph" : "";
   return (
     <div
       className={`glyphbox ${color} ${baseOrMark}`}
@@ -22,31 +22,43 @@ export const GlyphBox = ({ glyph, font, color }: GlyphBoxProps) => {
         color: paletteFor(glyph.cl),
       }}
     >
-      {fGlyph && fGlyph.name} ({glyph.g})
+      {fGlyph && fGlyph.name}
+      {" "}
+      (
+      {glyph.g}
+      )
       {(glyph.ax || glyph.ay) && (
-        <div>
-          {glyph.ax && (
-            <span>
-              <ArrowForwardIcon /> {glyph.ax}
-            </span>
-          )}
-          {glyph.ay && (
-            <span>
-              <ArrowUpwardIcon /> {glyph.ay}
-            </span>
-          )}
-        </div>
+      <div>
+        {glyph.ax && (
+        <span>
+          <ArrowForwardIcon /> 
+          {" "}
+          {glyph.ax}
+        </span>
+        )}
+        {glyph.ay && (
+        <span>
+          <ArrowUpwardIcon /> 
+          {" "}
+          {glyph.ay}
+        </span>
+        )}
+      </div>
       )}
       {(glyph.dx || glyph.dy) && (
         <div>
           {glyph.dx && (
             <span>
-              <ArrowRightIcon /> {glyph.dx}
+              <ArrowRightIcon /> 
+              {" "}
+              {glyph.dx}
             </span>
           )}
           {glyph.dy && (
             <span>
-              <ArrowDropUpIcon /> {glyph.dy}
+              <ArrowDropUpIcon /> 
+              {" "}
+              {glyph.dy}
             </span>
           )}
         </div>

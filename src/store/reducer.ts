@@ -1,4 +1,5 @@
-import { ADDED_FONT,
+import {
+  ADDED_FONT,
   CHANGED_TEXT,
   CHANGED_FONT,
   CHANGED_DRAWER_STATE,
@@ -7,30 +8,33 @@ import { ADDED_FONT,
   CHANGED_LANGUAGE,
   CHANGED_FEATURE_STATE,
   CHANGED_CLUSTER_LEVEL,
-  initialState } from "./actions";
+  initialState,
+} from "./actions";
 
 export default function appReducer(state = initialState, action: any) {
+  const features = { ...state.features };
   switch (action.type) {
     case CHANGED_FONT:
-      return { ...state, selected_font: action.selected_font};
+      return { ...state, selected_font: action.selected_font };
     case CHANGED_TEXT:
-      return { ...state, inputtext: action.inputtext};
+      return { ...state, inputtext: action.inputtext };
     case CHANGED_CLUSTER_LEVEL:
-      return { ...state, clusterLevel: action.clusterLevel};
+      return { ...state, clusterLevel: action.clusterLevel };
     case CHANGED_DIRECTION:
-      return { ...state, direction: action.direction};
+      return { ...state, direction: action.direction };
     case CHANGED_SCRIPT:
-      return { ...state, script: action.script};
+      return { ...state, script: action.script };
     case CHANGED_LANGUAGE:
-      return { ...state, language: action.language};
+      return { ...state, language: action.language };
     case CHANGED_DRAWER_STATE:
-      console.log("Changed drawer state", action.open);
-      return { ...state, drawerOpen: action.open};
+      return { ...state, drawerOpen: action.open };
     case ADDED_FONT:
-      return { ...state, fonts: [...state.fonts, action.added_font],
-        selected_font: state.fonts.length};
+      return {
+        ...state,
+        fonts: [...state.fonts, action.added_font],
+        selected_font: state.fonts.length,
+      };
     case CHANGED_FEATURE_STATE:
-      var features = {...state.features};
       if (!(action.feature in features)) {
         features[action.feature] = true;
       } else if (features[action.feature]) {
@@ -38,7 +42,7 @@ export default function appReducer(state = initialState, action: any) {
       } else {
         delete features[action.feature];
       }
-      return { ...state, features};
+      return { ...state, features };
 
     default:
       return state;

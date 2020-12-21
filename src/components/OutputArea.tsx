@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus,prefer-destructuring,@typescript-eslint/indent */
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import Table from "@material-ui/core/Table";
@@ -48,15 +49,15 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 function processDiffArray(
   diffOutput: Array<Diff<HBGlyph[], HBGlyph[]>>
 ): string[] {
-  const output = [];
-  for (const d of diffOutput) {
+  const output: string[] = [];
+  diffOutput.forEach((d) => {
     if (d.kind === "A") {
       output[d.index] = "glyphadded";
     } else if (d.kind === "E" || d.kind === "N") {
       // @ts-ignore
       output[(d as DiffEdit<HBGlyph[], HBGlyph[]>).path[0]] = "glyphmodified";
     }
-  }
+  });
   return output;
 }
 
@@ -69,12 +70,13 @@ const OutputArea = (props: PropsFromRedux) => {
   let stage = "GSUB";
   let lastRow: HBGlyph[] = [];
   let rowid = 0;
+  const { font, text } = props;
 
-  if (!(props.font && props.font.hbFont && props.text)) {
+  if (!(font && font.hbFont && text)) {
     return <div />;
   }
 
-  const shaping = props.font.shapeTrace(props.text, {
+  const shaping = font.shapeTrace(text, {
     ...props,
     stopAt: 0,
     stopPhase: 0,
@@ -82,24 +84,20 @@ const OutputArea = (props: PropsFromRedux) => {
   const fullBuffer = shaping[shaping.length - 1].t;
 
   const doPartialTrace = (lookup: number, phase: number) => {
-    var options: ShapingOptions = {
+    const options: ShapingOptions = {
       ...props,
       stopAt: lookup,
       stopPhase: phase,
     };
-    const shaping = props.font.shapeTrace(props.text, options);
-    setGlyphStringToBeDrawn(shaping[shaping.length - 1].t);
+    const partialShaping = font.shapeTrace(text, options);
+    setGlyphStringToBeDrawn(partialShaping[partialShaping.length - 1].t);
   };
 
-  const rowToHTML = (
-    row: StageMessage,
-    font: CrowbarFont,
-    fullBuffer: HBGlyph[]
-  ) => {
+  const rowToHTML = (row: StageMessage) => {
     // console.log(row.m, row.t);
-    var m = row.m.match(/Start of shaping/);
+    let m = row.m.match(/Start of shaping/);
     if (m) {
-      return props.clusterLevel == 2 ? (
+      return props.clusterLevel === 2 ? (
         <TableRow key={rowid++}>
           <TableCell> Pre-shaping</TableCell>
           <TableCell>
@@ -120,11 +118,11 @@ const OutputArea = (props: PropsFromRedux) => {
         <div />
       );
     }
-    var m = row.m.match(/(start|end).*(normalize|preprocess)/);
+    m = row.m.match(/(start|end).*(normalize|preprocess)/);
     if (m && row.t[0]) {
       return (
         <TableRow key={rowid++}>
-          <TableCell> {row.m} </TableCell>
+          <TableCell>{row.m}</TableCell>
           <TableCell>
             {row.t.map((glyph) => (
               <div className="glyphbox">
@@ -136,14 +134,15 @@ const OutputArea = (props: PropsFromRedux) => {
         </TableRow>
       );
     }
-    var m = row.m.match(/start table (....)/);
+    m = row.m.match(/start table (....)/);
     if (m) {
       stage = m[1];
       return (
         <TableRow key={rowid++}>
           <TableCell colSpan={2} className={classes.stageheader}>
             {" "}
-            {m[1]} Stage
+            {m[1]}
+            Stage
           </TableCell>
         </TableRow>
       );
@@ -161,7 +160,7 @@ const OutputArea = (props: PropsFromRedux) => {
     let debugInfo = null;
     let ix = 0;
     if (m2) {
-      ix = parseInt(m2[1]);
+      ix = parseInt(m2[1], 10);
       featurename = font.getFeatureForIndex(ix, stage);
       debugInfo = font.getDebugInfo(ix, stage);
     }
@@ -171,13 +170,13 @@ const OutputArea = (props: PropsFromRedux) => {
         key={rowid++}
         onMouseOver={(ev) => {
           let el = ev.target as HTMLElement;
-          while (el.tagName != "TR" && el.parentElement) {
+          while (el.tagName !== "TR" && el.parentElement) {
             el = el.parentElement;
           }
-          const index = parseInt(el.getAttribute("data-lookup") || "") || 0;
+          const index = parseInt(el.getAttribute("data-lookup") || "", 10) || 0;
           doPartialTrace(
             index,
-            el.getAttribute("data-stage") == "GSUB" ? 1 : 2
+            el.getAttribute("data-stage") === "GSUB" ? 1 : 2
           );
         }}
         onMouseLeave={() => setGlyphStringToBeDrawn(null)}
@@ -194,12 +193,12 @@ const OutputArea = (props: PropsFromRedux) => {
           {debugInfo && <b>{debugInfo.name}</b>}
         </TableCell>
         <TableCell>
-          {row.t.map((glyph: HBGlyph, ix: number) => (
+          {row.t.map((glyph: HBGlyph, glyphIx: number) => (
             <span
               onMouseEnter={() => setHighlightedGlyph(glyph.cl)}
               onMouseLeave={() => setHighlightedGlyph(-1)}
             >
-              <GlyphBox glyph={glyph} font={font} color={diffColors[ix]} />
+              <GlyphBox glyph={glyph} font={font} color={diffColors[glyphIx]} />
             </span>
           ))}
         </TableCell>
@@ -214,7 +213,7 @@ const OutputArea = (props: PropsFromRedux) => {
         <SVGArea
           highlightedglyph={highlightedGlyph}
           glyphstring={glyphStringToBeDrawn || fullBuffer}
-          font={props.font}
+          font={font}
         />
       )}
       <TableContainer component={Paper}>
@@ -226,9 +225,7 @@ const OutputArea = (props: PropsFromRedux) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {shaping.map((row: StageMessage) =>
-              rowToHTML(row, props.font, fullBuffer)
-            )}
+            {shaping.map((row: StageMessage) => rowToHTML(row))}
           </TableBody>
         </Table>
       </TableContainer>

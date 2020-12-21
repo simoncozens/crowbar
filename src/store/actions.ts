@@ -1,4 +1,4 @@
-import {CrowbarFont} from "../opentype/CrowbarFont";
+import { CrowbarFont } from "../opentype/CrowbarFont";
 
 export const ADDED_FONT = "ADDED_FONT";
 export const CHANGED_TEXT = "CHANGED_TEXT";
@@ -12,63 +12,62 @@ export const CHANGED_LANGUAGE = "CHANGED_LANGUAGE";
 
 export const changedFeatureState = (featureName: string) => ({
   type: CHANGED_FEATURE_STATE,
-  feature: featureName
+  feature: featureName,
 });
 
 export const changedDirection = (direction: string) => ({
   type: CHANGED_DIRECTION,
-  direction
+  direction,
 });
 
 export const changedScript = (script: string) => ({
   type: CHANGED_SCRIPT,
-  script
+  script,
 });
 
 export const changedLanguage = (language: string) => ({
   type: CHANGED_LANGUAGE,
-  language
+  language,
 });
 
-export const changedClusterLevel = (content:number) => ({
+export const changedClusterLevel = (content: number) => ({
   type: CHANGED_CLUSTER_LEVEL,
-  clusterLevel: content
+  clusterLevel: content,
 });
 
-
-export const changedDrawerState = (open:boolean) => ({
+export const changedDrawerState = (open: boolean) => ({
   type: CHANGED_DRAWER_STATE,
-  open
+  open,
 });
 
-export const changedTextAction = (content:string) => ({
+export const changedTextAction = (content: string) => ({
   type: CHANGED_TEXT,
-  inputtext: content
+  inputtext: content,
 });
 
-export const changedFontAction = (content:number) => ({
+export const changedFontAction = (content: number) => ({
   type: CHANGED_FONT,
-  selected_font: content
+  selected_font: content,
 });
 
-export const _addedFontAction = (font:CrowbarFont) => ({
+export const addedFontActionInternal = (font: CrowbarFont) => ({
   type: ADDED_FONT,
-  added_font: font
+  added_font: font,
 });
 
 export function addedFontAction(fontFile: File) {
-  return function (dispatch :any) {
-    new Promise((resolve, reject) => {
+  return (dispatch: any) => {
+    new Promise((resolve) => {
       const fr = new FileReader();
       fr.onload = () => {
-        resolve(fr.result );
+        resolve(fr.result);
       };
       fr.readAsArrayBuffer(fontFile);
-    }).then( (result) => {
+    }).then((result) => {
       const ab = result as ArrayBuffer;
       const f = new CrowbarFont(fontFile.name, ab);
-      f.initOT(function (crowbarFont: CrowbarFont) {
-        dispatch(_addedFontAction(crowbarFont));
+      f.initOT((crowbarFont: CrowbarFont) => {
+        dispatch(addedFontActionInternal(crowbarFont));
       });
     });
   };
@@ -88,13 +87,12 @@ export interface CrowbarState {
 
 export const initialState: CrowbarState = {
   selected_font: 0,
-  fonts: [
-  ],
+  fonts: [],
   inputtext: "",
   drawerOpen: false,
   features: {},
   clusterLevel: 0,
   direction: "auto",
   script: "",
-  language: ""
+  language: "",
 };

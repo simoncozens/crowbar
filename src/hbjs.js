@@ -1,3 +1,4 @@
+/* eslint-disable */
 function hbjs(instance) {
   "use strict";
 

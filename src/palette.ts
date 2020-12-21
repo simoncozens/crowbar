@@ -1,4 +1,4 @@
-export var palette = [
+export const palette = [
   "#C23B23",
   "#c79c52",
   "#EADA52",
@@ -7,6 +7,4 @@ export var palette = [
   "#976ED7",
 ];
 
-export const paletteFor = (id: number) => {
-  return palette[id % palette.length];
-};
+export const paletteFor = (id: number) => palette[id % palette.length];

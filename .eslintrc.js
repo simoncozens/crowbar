@@ -13,6 +13,7 @@ module.exports = {
       1,
       { extensions: [".js", ".jsx", ".ts", ".tsx"] },
     ],
+    "@typescript-eslint/comma-dangle": "off",
   },
   parserOptions: {
     project: "./tsconfig.json",

@@ -1,7 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { CrowbarFont, HBGlyph } from "../opentype/CrowbarFont";
 
-type SVGProps = {
+export type SVGProps = {
   glyphstring: HBGlyph[];
   font: CrowbarFont;
   highlightedglyph: number;

@@ -1,3 +1,5 @@
+/* eslint no-param-reassign: ["error", { "props": false }] */
+
 import { Font, load, Glyph, Path } from "opentype.js";
 import * as SVG from "@svgdotjs/svg.js";
 import { paletteFor } from "../palette";
@@ -34,11 +36,11 @@ function onlyUnique(value: any, index: number, self: any) {
   return self.indexOf(value) === index;
 }
 
-function _arrayBufferToBase64(buffer: ArrayBuffer) {
+function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = "";
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < len; i += 1) {
     binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
@@ -47,7 +49,7 @@ function _arrayBufferToBase64(buffer: ArrayBuffer) {
 function remapClusters(glyphs: HBGlyph[], clustermap: number[]) {
   // We want cluster IDs to be sequential,
   // not based on UTF8 offset
-  glyphs.forEach((glyph: HBGlyph, ix: number) => {
+  glyphs.forEach((glyph: HBGlyph) => {
     if (!glyph.offset) {
       glyph.offset = glyph.cl;
     }
@@ -60,12 +62,19 @@ function remapClusters(glyphs: HBGlyph[], clustermap: number[]) {
 
 export class CrowbarFont {
   name: string;
+
   base64?: string;
+
   fontFace?: string;
+
   hbFont?: any;
+
   otFont?: Font;
+
   debugInfo?: any;
+
   supportedScripts: Set<string>;
+
   supportedLanguages: Set<string>;
 
   constructor(name: string, fontBlob?: ArrayBuffer) {
@@ -73,11 +82,11 @@ export class CrowbarFont {
     this.supportedLanguages = new Set();
     this.supportedScripts = new Set();
     if (fontBlob) {
-      this.base64 = `data:application/octet-stream;base64,${_arrayBufferToBase64(
+      this.base64 = `data:application/octet-stream;base64,${arrayBufferToBase64(
         fontBlob
       )}`;
       this.fontFace = `@font-face{font-family:"${name}"; src:url(${this.base64});}`;
-      const hbjs = window["hbjs"];
+      const { hbjs } = window;
       const blob = hbjs.createBlob(fontBlob);
       const face = hbjs.createFace(blob, 0);
       this.hbFont = hbjs.createFont(face);
@@ -92,15 +101,14 @@ export class CrowbarFont {
 
   initOT(cb: any) {
     const that = this;
-    load(this.base64 as string, function (err, otFont) {
+    load(this.base64 as string, (err, otFont) => {
       that.otFont = otFont;
-      if (err) {
-        console.log(err);
-      }
+      // if (err) {
+      //   console.log(err);
+      // }
       if (otFont && otFont.tables.gsub) {
         otFont.tables.gsub.scripts.forEach((script: any) => {
           that.supportedScripts.add(script.tag);
-          console.log(script);
           if (script.script.langSysRecords) {
             script.script.langSysRecords.forEach((lang: any) => {
               that.supportedLanguages.add(lang.tag);
@@ -129,7 +137,7 @@ export class CrowbarFont {
   }
 
   shapeTrace(s: string, options: ShapingOptions): StageMessage[] {
-    const hbjs = window["hbjs"];
+    const { hbjs } = window;
     const featurestring = Object.keys(options.features)
       .map((f) => (options.features[f] ? "+" : "-") + f)
       .join(",");
@@ -166,11 +174,11 @@ export class CrowbarFont {
     let depth = 0;
     result.forEach((r: StageMessage) => {
       if (r.m.startsWith("start lookup")) {
-        depth++;
+        depth += 1;
       }
       r.depth = depth;
       if (r.m.startsWith("end lookup")) {
-        depth--;
+        depth -= 1;
       }
       remapClusters(r.t, clustermap);
     });
@@ -197,8 +205,8 @@ export class CrowbarFont {
     buffer.destroy();
     remapClusters(endbuffer, clustermap);
     newResult.push({ m: "End of shaping", t: endbuffer, depth: 0 });
-    for (const r of newResult) {
-      for (const t of r.t) {
+    newResult.forEach((r) => {
+      r.t.forEach((t) => {
         if (!t.ax || t.ax === 0) {
           delete t.ax;
         }
@@ -211,8 +219,8 @@ export class CrowbarFont {
         if (!t.dy || t.dy === 0) {
           delete t.dy;
         }
-      }
-    }
+      });
+    });
 
     return newResult;
   }
@@ -257,7 +265,6 @@ export class CrowbarFont {
   getDebugInfo(ix: number, stage: string) {
     if (this.debugInfo && this.debugInfo[stage] && this.debugInfo[stage][ix]) {
       const debugData = this.debugInfo[stage][ix];
-      var featureInfo = debugData[2];
       return {
         source: debugData[0],
         name: debugData[1],
@@ -266,6 +273,7 @@ export class CrowbarFont {
         feature: debugData[2] && debugData[2][2],
       };
     }
+    return {};
   }
 
   getFeatureForIndex(ix: number, stage: string) {
@@ -278,13 +286,12 @@ export class CrowbarFont {
     } else {
       features = this.otFont.tables.gpos.features;
     }
-    const featuremap = [];
-    for (const f of features.filter(onlyUnique)) {
-      var li: number;
-      for (li of f.feature.lookupListIndexes) {
+    const featuremap: string[] = [];
+    features.filter(onlyUnique).forEach((f: any) => {
+      f.feature.lookupListIndexes.forEach((li: number) => {
         featuremap[li] = f.tag;
-      }
-    }
+      });
+    });
     return featuremap[ix];
   }
 
@@ -309,17 +316,15 @@ export class CrowbarFont {
     let curAY = 0;
     const totalSVG = SVG.SVG();
     const maingroup = totalSVG.group();
-    glyphstring.forEach((g, ix) => {
+    glyphstring.forEach((g) => {
       const group = maingroup.group();
       const svgDoc = SVG.SVG(this.getSVG(g.g));
-      for (const c of svgDoc.children()) {
-        group.add(c);
-      }
+      svgDoc.children().forEach((c) => group.add(c));
       group.transform({
         translate: [curAX + (g.dx || 0), curAY + (g.dy || 0)],
       });
       group.attr({ fill: paletteFor(g.cl) });
-      if (g.cl == highlightedglyph) {
+      if (g.cl === highlightedglyph) {
         const otGlyph = this.getGlyph(g.g);
         if (otGlyph) {
           group

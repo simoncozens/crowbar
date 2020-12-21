@@ -2,7 +2,11 @@ import React from "react";
 import clsx from "clsx";
 
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { createMuiTheme, ThemeProvider, makeStyles } from "@material-ui/core/styles";
+import {
+  createMuiTheme,
+  ThemeProvider,
+  makeStyles,
+} from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import "./App.css";
 import { connect, ConnectedProps } from "react-redux";
@@ -11,12 +15,10 @@ import OutputArea from "./components/OutputArea";
 import BigTextBox from "./components/BigTextBox";
 import { CrowbarState } from "./store/actions";
 
-const mapStateToProps = (state:CrowbarState) => {
-  return { 
-    fontFaces: state.fonts.map( (x) => x.fontFace ),
-    drawerOpen: state.drawerOpen
-  };
-};
+const mapStateToProps = (state: CrowbarState) => ({
+  fontFaces: state.fonts.map((x) => x.fontFace),
+  drawerOpen: state.drawerOpen,
+});
 
 const connector = connect(mapStateToProps, {});
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -26,7 +28,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    alignContent: "center"
+    alignContent: "center",
   },
   drawerHeader: {
     display: "flex",
@@ -54,6 +56,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 const App = (props: PropsFromRedux) => {
+  const { fontFaces, drawerOpen } = props;
   const classes = useStyles();
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -67,17 +70,15 @@ const App = (props: PropsFromRedux) => {
     [prefersDarkMode],
   );
 
-
   return (
     <ThemeProvider theme={theme}>
-      <style>
-        {props.fontFaces.join("\n")}
-      </style>
+      <style>{fontFaces.join("\n")}</style>
       <div className={classes.root}>
         <CssBaseline />
-        <main className={clsx(classes.content, {
-          [classes.contentShift]: props.drawerOpen,
-        })}
+        <main
+          className={clsx(classes.content, {
+            [classes.contentShift]: drawerOpen,
+          })}
         >
           <div className={classes.drawerHeader} />
           <BigTextBox />
