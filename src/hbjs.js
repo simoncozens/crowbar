@@ -19,6 +19,25 @@ function hbjs(instance) {
     );
   }
 
+  function _buffer_flag(s) {
+    if (s == "BOT") {
+      return 0x1;
+    }
+    if (s == "EOT") {
+      return 0x2;
+    }
+    if (s == "PRESERVE_DEFAULT_IGNORABLES") {
+      return 0x4;
+    }
+    if (s == "REMOVE_DEFAULT_IGNORABLES") {
+      return 0x8;
+    }
+    if (s == "DO_NOT_INSERT_DOTTED_CIRCLE") {
+      return 0x10;
+    }
+    return 0x0;
+  }
+
   /**
    * Create an object representing a Harfbuzz blob.
    * @param {string} blob A blob of binary data (usually the contents of a font file).
@@ -64,8 +83,7 @@ function hbjs(instance) {
         if (!length) {
           return;
         }
-        var lengthptr = exports.malloc(4);
-        var blobptr = exports.hb_blob_get_data(blob, lengthptr);
+        var blobptr = exports.hb_blob_get_data(blob, null);
         var table_string = heapu8.subarray(blobptr, blobptr + length);
         return table_string;
       },
@@ -80,9 +98,6 @@ function hbjs(instance) {
 
   var pathBufferSize = 65536; // should be enough for most glyphs
   var pathBuffer = exports.malloc(pathBufferSize); // permanently allocated
-
-  var nameBufferSize = 256;
-  var nameBuffer = exports.malloc(nameBufferSize); // permanently allocated
 
   /**
    * Create an object representing a Harfbuzz font.
@@ -109,25 +124,8 @@ function hbjs(instance) {
         : "";
     }
 
-    function glyphName(glyphId) {
-      var ok = exports.hb_font_get_glyph_name(
-        ptr,
-        glyphId,
-        nameBuffer,
-        nameBufferSize
-      );
-      if (!ok) {
-        return "";
-      }
-      var decoded = utf8Decoder.decode(
-        heapu8.subarray(nameBuffer, nameBuffer + nameBufferSize)
-      );
-      return decoded.replace(/\0.*/, "");
-    }
-
     return {
       ptr: ptr,
-      glyphName: glyphName,
       glyphToPath: glyphToPath,
       /**
        * Return a glyph as a JSON path string
@@ -227,6 +225,23 @@ function hbjs(instance) {
             btt: 7,
           }[dir] || 0
         );
+      },
+      /**
+       * Set buffer flags explicitly.
+       * @param {string[]} flags: A list of strings which may be either:
+       * "BOT"
+       * "EOT"
+       * "PRESERVE_DEFAULT_IGNORABLES"
+       * "REMOVE_DEFAULT_IGNORABLES"
+       * "DO_NOT_INSERT_DOTTED_CIRCLE"
+       */
+      setFlags: function (flags) {
+        var flagValue = 0;
+        flags.forEach(function (s) {
+          flagValue |= _buffer_flag(s);
+        });
+
+        exports.hb_buffer_set_flags(ptr, flagValue);
       },
       /**
        * Set buffer language explicitly.
@@ -340,7 +355,7 @@ function hbjs(instance) {
   */
 
   function shapeWithTrace(font, buffer, features, stop_at, stop_phase) {
-    var bufLen = 10 * 1024 * 1024;
+    var bufLen = 1024 * 1024;
     var traceBuffer = exports.malloc(bufLen);
     var featurestr = createCString(features);
     var traceLen = exports.hbjs_shape_with_trace(

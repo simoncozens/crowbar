@@ -10,6 +10,7 @@ export const CHANGED_CLUSTER_LEVEL = "CHANGED_CLUSTER_LEVEL";
 export const CHANGED_DIRECTION = "CHANGED_DIRECTION";
 export const CHANGED_SCRIPT = "CHANGED_SCRIPT";
 export const CHANGED_LANGUAGE = "CHANGED_LANGUAGE";
+export const CHANGED_BUFFER_FLAG = "CHANGED_BUFFER_FLAG";
 
 export const changedFeatureState = (featureName: string) => ({
   type: CHANGED_FEATURE_STATE,
@@ -34,6 +35,11 @@ export const changedScript = (script: string) => ({
 export const changedLanguage = (language: string) => ({
   type: CHANGED_LANGUAGE,
   language,
+});
+
+export const changedBufferFlag = (bufferFlag: string[]) => ({
+  type: CHANGED_BUFFER_FLAG,
+  bufferFlag,
 });
 
 export const changedClusterLevel = (content: number) => ({
@@ -90,6 +96,7 @@ export interface CrowbarState {
   direction: string;
   script: string;
   language: string;
+  bufferFlag: string[];
 }
 
 export const initialState: CrowbarState = {
@@ -103,4 +110,5 @@ export const initialState: CrowbarState = {
   direction: "auto",
   script: "",
   language: "",
+  bufferFlag: [],
 };

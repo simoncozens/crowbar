@@ -9,6 +9,7 @@ import {
   CHANGED_FEATURE_STATE,
   CHANGED_FEATURE_STRING,
   CHANGED_CLUSTER_LEVEL,
+  CHANGED_BUFFER_FLAG,
   initialState,
 } from "./actions";
 
@@ -21,6 +22,8 @@ export default function appReducer(state = initialState, action: any) {
       return { ...state, inputtext: action.inputtext };
     case CHANGED_CLUSTER_LEVEL:
       return { ...state, clusterLevel: action.clusterLevel };
+    case CHANGED_BUFFER_FLAG:
+      return { ...state, bufferFlag: action.bufferFlag };
     case CHANGED_DIRECTION:
       return { ...state, direction: action.direction };
     case CHANGED_SCRIPT:

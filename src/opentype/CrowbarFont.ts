@@ -31,6 +31,7 @@ export interface ShapingOptions {
   direction: string;
   script: string;
   language: string;
+  bufferFlag: string[];
 }
 
 function onlyUnique(value: any, index: number, self: any) {
@@ -148,6 +149,7 @@ export class CrowbarFont {
     const buffer = hbjs.createBuffer();
     buffer.setClusterLevel(options.clusterLevel);
     buffer.addText(s);
+    buffer.setFlags(options.bufferFlag);
     buffer.guessSegmentProperties();
     // console.log(options);
     featurestring = `+DUMY,${featurestring}`; // Seriously?

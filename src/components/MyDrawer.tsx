@@ -25,6 +25,7 @@ import {
   changedFeatureState,
   changedClusterLevel,
   changedFeatureString,
+  changedBufferFlag,
   CrowbarState,
 } from "../store/actions";
 import { CrowbarFont } from "../opentype/CrowbarFont";
@@ -41,6 +42,7 @@ const mapStateToProps = (state: CrowbarState) => ({
   direction: state.direction,
   script: state.script,
   language: state.language,
+  bufferFlag: state.bufferFlag,
 });
 
 const connector = connect(mapStateToProps, {
@@ -51,6 +53,7 @@ const connector = connect(mapStateToProps, {
   changedFeatureState,
   changedClusterLevel,
   changedFeatureString,
+  changedBufferFlag,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -254,6 +257,28 @@ const MyDrawer = (props: PropsFromRedux) => {
           <MenuItem value={0}>Monotone graphemes</MenuItem>
           <MenuItem value={1}>Monotone characters</MenuItem>
           <MenuItem value={2}>Characters</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl className={classes.formControl}>
+        <InputLabel id="buffer-flag-label">Buffer Flags</InputLabel>
+        <Select
+          labelId="buffer-flag-label"
+          id="buffer-flag"
+          multiple
+          value={props.bufferFlag}
+          onChange={(e) => props.changedBufferFlag(e.target.value as string[])}
+        >
+          <MenuItem value="BOT">Beginning of text paragraph</MenuItem>
+          <MenuItem value="EOT">Monotone characters</MenuItem>
+          <MenuItem value="PRESERVE_DEFAULT_IGNORABLES">
+            Preserve default ignorables
+          </MenuItem>
+          <MenuItem value="REMOVE_DEFAULT_IGNORABLES">
+            Remove default ignorables
+          </MenuItem>
+          <MenuItem value="DO_NOT_INSERT_DOTTED_CIRCLE">
+            Do not insert dotted circle
+          </MenuItem>
         </Select>
       </FormControl>
     </Drawer>
