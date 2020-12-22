@@ -195,7 +195,9 @@ const MyDrawer = (props: PropsFromRedux) => {
         renderOption={(option) => (
           <>
             <span className={classes.flag}>
-              {font.supportedScripts.has(option.tag.toLowerCase()) ? "✅" : " "}
+              {font && font.supportedScripts.has(option.tag.toLowerCase())
+                ? "✅"
+                : " "}
             </span>
             {option.label}
           </>
@@ -207,18 +209,32 @@ const MyDrawer = (props: PropsFromRedux) => {
         )}
       />
       <Autocomplete
+        freeSolo
         id="language"
         options={opentypeLanguages.sort(sortLanguages)}
         renderOption={(option) => (
           <>
             <span className={classes.flag}>
-              {font.supportedLanguages.has(option.tag) ? "✅" : " "}
+              {font && font.supportedLanguages.has(option.tag) ? "✅" : " "}
             </span>
             {option.label}
           </>
         )}
-        getOptionLabel={(option) => option.label}
-        onChange={(e, v) => props.changedLanguage(v ? v.tag : "")}
+        getOptionLabel={(option) => {
+          if (typeof option === "string") {
+            return option;
+          }
+          return option.label;
+        }}
+        onChange={(e, v) => {
+          if (!v) {
+            return props.changedLanguage("");
+          }
+          if (typeof v === "string") {
+            return props.changedLanguage(v);
+          }
+          return props.changedLanguage(v.tag);
+        }}
         renderInput={(params) => (
           <TextField {...params} label="Language" variant="outlined" />
         )}
