@@ -46,7 +46,7 @@ const NavBar = (props: PropsFromRedux) => {
         action(acceptedFiles[0]);
       }
     },
-    [action],
+    [action]
   );
 
   const { getRootProps, getInputProps, isDragAccept } = useDropzone({

@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 import React from "react";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
@@ -22,43 +23,31 @@ export const GlyphBox = ({ glyph, font, color }: GlyphBoxProps) => {
         color: paletteFor(glyph.cl),
       }}
     >
-      {fGlyph && fGlyph.name}
-      {" "}
-      (
-      {glyph.g}
-      )
+      {fGlyph && fGlyph.name} ({glyph.g})
       {(glyph.ax || glyph.ay) && (
-      <div>
-        {glyph.ax && (
-        <span>
-          <ArrowForwardIcon /> 
-          {" "}
-          {glyph.ax}
-        </span>
-        )}
-        {glyph.ay && (
-        <span>
-          <ArrowUpwardIcon /> 
-          {" "}
-          {glyph.ay}
-        </span>
-        )}
-      </div>
+        <div>
+          {glyph.ax && (
+            <span>
+              <ArrowForwardIcon /> {glyph.ax}
+            </span>
+          )}
+          {glyph.ay && (
+            <span>
+              <ArrowUpwardIcon /> {glyph.ay}
+            </span>
+          )}
+        </div>
       )}
       {(glyph.dx || glyph.dy) && (
         <div>
           {glyph.dx && (
             <span>
-              <ArrowRightIcon /> 
-              {" "}
-              {glyph.dx}
+              <ArrowRightIcon /> {glyph.dx}
             </span>
           )}
           {glyph.dy && (
             <span>
-              <ArrowDropUpIcon /> 
-              {" "}
-              {glyph.dy}
+              <ArrowDropUpIcon /> {glyph.dy}
             </span>
           )}
         </div>

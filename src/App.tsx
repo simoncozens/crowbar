@@ -67,7 +67,7 @@ const App = (props: PropsFromRedux) => {
           type: prefersDarkMode ? "dark" : "light",
         },
       }),
-    [prefersDarkMode],
+    [prefersDarkMode]
   );
 
   return (

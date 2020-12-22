@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: theme.palette.background.paper,
       padding: theme.spacing(1),
     },
-  }),
+  })
 );
 
 const BigTextBox = (props: PropsFromRedux) => {

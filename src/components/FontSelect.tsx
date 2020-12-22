@@ -39,7 +39,7 @@ const FontSelect = (props: PropsFromRedux) => {
         marginLeft: theme.spacing(1),
         width: "100%",
       },
-    }),
+    })
   );
   const classes = useStyles();
 
