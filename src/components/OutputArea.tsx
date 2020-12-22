@@ -1,4 +1,4 @@
-/* eslint-disable no-plusplus,prefer-destructuring,@typescript-eslint/indent */
+/* eslint-disable no-plusplus,prefer-destructuring,@typescript-eslint/indent,react/jsx-one-expression-per-line */
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import Table from "@material-ui/core/Table";
@@ -190,9 +190,12 @@ const OutputArea = (props: PropsFromRedux) => {
           {row.m}
           {featurename && <br />}
           {featurename && <b>{featurename}</b>}
-          {debugInfo && <br />}
-          {debugInfo && `${debugInfo.source} : `}
-          {debugInfo && <b>{debugInfo.name}</b>}
+          {debugInfo && (
+            <>
+              <br />
+              {debugInfo.source} :<b>{debugInfo.name}</b>
+            </>
+          )}
         </TableCell>
         <TableCell>
           {row.t.map((glyph: HBGlyph, glyphIx: number) => (

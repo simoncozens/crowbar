@@ -278,7 +278,7 @@ export class CrowbarFont {
         feature: debugData[2] && debugData[2][2],
       };
     }
-    return {};
+    return null;
   }
 
   getFeatureForIndex(ix: number, stage: string) {
