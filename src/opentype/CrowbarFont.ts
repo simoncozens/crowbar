@@ -79,7 +79,7 @@ export class CrowbarFont {
 
   supportedLanguages: Set<string>;
 
-  constructor(name: string, fontBlob?: ArrayBuffer) {
+  constructor(name: string, fontBlob?: ArrayBuffer, faceIdx: number = 0) {
     this.name = name;
     this.supportedLanguages = new Set();
     this.supportedScripts = new Set();
@@ -90,7 +90,7 @@ export class CrowbarFont {
       this.fontFace = `@font-face{font-family:"${name}"; src:url(${this.base64});}`;
       const { hbjs } = window;
       const blob = hbjs.createBlob(fontBlob);
-      const face = hbjs.createFace(blob, 0);
+      const face = hbjs.createFace(blob, faceIdx);
       this.hbFont = hbjs.createFont(face);
       const debgTable = face.reference_table("Debg");
       if (debgTable) {

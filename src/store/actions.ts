@@ -77,10 +77,26 @@ export function addedFontAction(fontFile: File) {
       fr.readAsArrayBuffer(fontFile);
     }).then((result) => {
       const ab = result as ArrayBuffer;
-      const f = new CrowbarFont(fontFile.name, ab);
-      f.initOT((crowbarFont: CrowbarFont) => {
-        dispatch(addedFontActionInternal(crowbarFont));
-      });
+      const header = new Uint8Array(ab.slice(0, 4));
+      if (
+        header[0] === 116 && // t
+        header[1] === 116 && // t
+        header[2] === 99 && // f
+        header[3] === 102 // c
+      ) {
+        const count = new Uint8Array(ab.slice(11, 12))[0]; // If there are more than 255 I hate you
+        for (let i = 0; i < count; i += 1) {
+          const f = new CrowbarFont(`${fontFile.name}#${i}`, ab, i);
+          f.initOT((crowbarFont: CrowbarFont) => {
+            dispatch(addedFontActionInternal(crowbarFont));
+          });
+        }
+      } else {
+        const f = new CrowbarFont(fontFile.name, ab);
+        f.initOT((crowbarFont: CrowbarFont) => {
+          dispatch(addedFontActionInternal(crowbarFont));
+        });
+      }
     });
   };
 }

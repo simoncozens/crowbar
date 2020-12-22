@@ -39,7 +39,9 @@ const NavBar = (props: PropsFromRedux) => {
     (acceptedFiles) => {
       if (
         !acceptedFiles[0].name.endsWith(".otf") &&
-        !acceptedFiles[0].name.endsWith(".ttf")
+        !acceptedFiles[0].name.endsWith(".ttf") &&
+        !acceptedFiles[0].name.endsWith(".ttc") &&
+        !acceptedFiles[0].name.endsWith(".otc")
       ) {
         setShaking(true);
       } else {
