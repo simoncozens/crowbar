@@ -139,7 +139,7 @@ export class CrowbarFont {
 
   shapeTrace(s: string, options: ShapingOptions): StageMessage[] {
     const { hbjs } = window;
-    const featurestring =
+    let featurestring =
       options.featureString ||
       Object.keys(options.features)
         .map((f) => (options.features[f] ? "+" : "-") + f)
@@ -150,6 +150,7 @@ export class CrowbarFont {
     buffer.addText(s);
     buffer.guessSegmentProperties();
     // console.log(options);
+    featurestring = `+DUMY,${featurestring}`; // Seriously?
     // console.log(featurestring);
     if (options.direction !== "auto") {
       buffer.setDirection(options.direction);
