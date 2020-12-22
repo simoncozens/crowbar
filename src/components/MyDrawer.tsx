@@ -269,7 +269,7 @@ const MyDrawer = (props: PropsFromRedux) => {
           onChange={(e) => props.changedBufferFlag(e.target.value as string[])}
         >
           <MenuItem value="BOT">Beginning of text paragraph</MenuItem>
-          <MenuItem value="EOT">Monotone characters</MenuItem>
+          <MenuItem value="EOT">End of text paragraph</MenuItem>
           <MenuItem value="PRESERVE_DEFAULT_IGNORABLES">
             Preserve default ignorables
           </MenuItem>
