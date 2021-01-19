@@ -234,7 +234,11 @@ export class CrowbarFont {
     if (!this.otFont) {
       return null;
     }
-    return this.otFont.glyphs.get(gid);
+    try {
+      return this.otFont.glyphs.get(gid);
+    } catch (error) {
+      return null;
+    }
   }
 
   gsubFeatureTags(): string[] {
