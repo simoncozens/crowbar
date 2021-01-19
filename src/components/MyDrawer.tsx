@@ -193,6 +193,7 @@ const MyDrawer = (props: PropsFromRedux) => {
       <Divider />
 
       <Autocomplete
+        freeSolo
         id="script"
         options={harfbuzzScripts.sort(sortScripts)}
         renderOption={(option) => (
@@ -205,8 +206,21 @@ const MyDrawer = (props: PropsFromRedux) => {
             {option.label}
           </>
         )}
-        getOptionLabel={(option) => option.label}
-        onChange={(e, v) => props.changedScript(v ? v.tag : "")}
+        getOptionLabel={(option) => {
+          if (typeof option === "string") {
+            return option;
+          }
+          return option.label;
+        }}
+        onChange={(e, v) => {
+          if (!v) {
+            return props.changedScript("");
+          }
+          if (typeof v === "string") {
+            return props.changedScript(v);
+          }
+          return props.changedScript(v.tag);
+        }}
         renderInput={(params) => (
           <TextField {...params} label="Script" variant="outlined" />
         )}
