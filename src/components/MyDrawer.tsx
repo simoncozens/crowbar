@@ -13,10 +13,12 @@ import IconButton from "@material-ui/core/IconButton";
 import Chip from "@material-ui/core/Chip";
 import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
+import Checkbox from "@material-ui/core/Checkbox";
 import {
   changedDrawerState,
   changedDirection,
@@ -26,6 +28,7 @@ import {
   changedClusterLevel,
   changedFeatureString,
   changedBufferFlag,
+  changedShowAllLookups,
   CrowbarState,
 } from "../store/actions";
 import { CrowbarFont } from "../opentype/CrowbarFont";
@@ -43,6 +46,7 @@ const mapStateToProps = (state: CrowbarState) => ({
   script: state.script,
   language: state.language,
   bufferFlag: state.bufferFlag,
+  showAllLookups: state.showAllLookups,
 });
 
 const connector = connect(mapStateToProps, {
@@ -54,6 +58,7 @@ const connector = connect(mapStateToProps, {
   changedClusterLevel,
   changedFeatureString,
   changedBufferFlag,
+  changedShowAllLookups,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -295,6 +300,16 @@ const MyDrawer = (props: PropsFromRedux) => {
           </MenuItem>
         </Select>
       </FormControl>
+      <FormControlLabel
+        control={
+          <Checkbox
+            name="show-all-lookups"
+            checked={props.showAllLookups}
+            onChange={(e) => props.changedShowAllLookups(e.target.checked)}
+          />
+        }
+        label="Show All Lookups"
+      />
     </Drawer>
   );
 };
