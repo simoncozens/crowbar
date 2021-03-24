@@ -305,7 +305,10 @@ const MyDrawer = (props: PropsFromRedux) => {
           <Checkbox
             name="show-all-lookups"
             checked={props.showAllLookups}
-            onChange={(e) => props.changedShowAllLookups(e.target.checked)}
+            value={props.showAllLookups}
+            onChange={() => {
+              props.changedShowAllLookups(!props.showAllLookups);
+            }}
           />
         }
         label="Show All Lookups"
