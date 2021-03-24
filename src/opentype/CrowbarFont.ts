@@ -32,6 +32,7 @@ export interface ShapingOptions {
   script: string;
   language: string;
   bufferFlag: string[];
+  showAllLookups: boolean;
 }
 
 function onlyUnique(value: any, index: number, self: any) {
@@ -198,6 +199,7 @@ export class CrowbarFont {
         return;
       }
       if (
+        options.showAllLookups ||
         JSON.stringify(r.t) !== lastBuf ||
         (r.m.startsWith("start lookup") &&
           result[ix + 1] &&

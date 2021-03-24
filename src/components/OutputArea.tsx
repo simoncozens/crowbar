@@ -36,6 +36,7 @@ const mapStateToProps = (state: CrowbarState) => {
     script: state.script,
     language: state.language,
     bufferFlag: state.bufferFlag,
+    showAllLookups: state.showAllLookups,
   };
 };
 

@@ -11,6 +11,7 @@ export const CHANGED_DIRECTION = "CHANGED_DIRECTION";
 export const CHANGED_SCRIPT = "CHANGED_SCRIPT";
 export const CHANGED_LANGUAGE = "CHANGED_LANGUAGE";
 export const CHANGED_BUFFER_FLAG = "CHANGED_BUFFER_FLAG";
+export const CHANGED_SHOW_ALL_LOOKUPS = "CHANGED_SHOW_ALL_LOOKUPS";
 
 export const changedFeatureState = (featureName: string) => ({
   type: CHANGED_FEATURE_STATE,
@@ -45,6 +46,11 @@ export const changedBufferFlag = (bufferFlag: string[]) => ({
 export const changedClusterLevel = (content: number) => ({
   type: CHANGED_CLUSTER_LEVEL,
   clusterLevel: content,
+});
+
+export const changedShowAllLookups = (show: boolean) => ({
+  type: CHANGED_SHOW_ALL_LOOKUPS,
+  showAllLookups: show,
 });
 
 export const changedDrawerState = (open: boolean) => ({
@@ -113,6 +119,7 @@ export interface CrowbarState {
   script: string;
   language: string;
   bufferFlag: string[];
+  showAllLookups: boolean;
 }
 
 export const initialState: CrowbarState = {
@@ -127,4 +134,5 @@ export const initialState: CrowbarState = {
   script: "",
   language: "",
   bufferFlag: [],
+  showAllLookups: false,
 };

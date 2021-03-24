@@ -10,6 +10,7 @@ import {
   CHANGED_FEATURE_STRING,
   CHANGED_CLUSTER_LEVEL,
   CHANGED_BUFFER_FLAG,
+  CHANGED_SHOW_ALL_LOOKUPS,
   initialState,
 } from "./actions";
 
@@ -32,6 +33,8 @@ export default function appReducer(state = initialState, action: any) {
       return { ...state, language: action.language };
     case CHANGED_DRAWER_STATE:
       return { ...state, drawerOpen: action.open };
+    case CHANGED_SHOW_ALL_LOOKUPS:
+      return { ...state, showAllLookups: action.showAllLookups };
     case ADDED_FONT:
       return {
         ...state,

@@ -15,6 +15,7 @@ module.exports = {
             { extensions: [".js", ".jsx", ".ts", ".tsx"] },
         ],
         "@typescript-eslint/comma-dangle": "off",
+        "react/jsx-wrap-multilines": "off",
         "prettier/prettier": "error",
     },
     parserOptions: {
