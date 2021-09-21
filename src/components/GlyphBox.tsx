@@ -15,7 +15,15 @@ export type GlyphBoxProps = {
 
 export const GlyphBox = ({ glyph, font, color }: GlyphBoxProps) => {
   const fGlyph = font.getGlyph(glyph.g);
-  const baseOrMark = font.getGlyphClass(glyph.g) === 3 ? "markglyph" : "";
+  let baseOrMark = "";
+  try {
+    if (font.getGlyphClass(glyph.g) === 3) {
+      baseOrMark = "markglyph";
+    }
+  } catch (e) {
+    // Stay at empty
+  }
+
   return (
     <div
       className={`glyphbox ${color} ${baseOrMark}`}
