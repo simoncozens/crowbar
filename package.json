@@ -24,14 +24,14 @@
     "deep-diff": "^1.0.2",
     "material-ui-dropzone": "^3.5.0",
     "opentype.js": "github:simoncozens/opentype.js#crowbar",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
     "react-dropzone": "^10.2.1",
-    "react-redux": "^7.2.2",
+    "react-redux": "^7.2.5",
     "react-scripts": "^4.0.3",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "typescript": "~3.7.2"
+    "typescript": "~4.4.3"
   },
   "scripts": {
     "start": "react-scripts start",
