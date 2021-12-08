@@ -14,6 +14,8 @@ To use it, drag an OTF font to the navigation bar. Crowbar runs entirely within 
 
 OpenType features can be specified from the drawer on the right hand side. Crowbar lists all of the features defined in your font. Clicking once on a feature name will force a feature on; clicking again will force it off; clicking a third time will restore it to the default. You can also choose the clustering level from the drawer which will affect how clusters of glyphs are coloured.
 
+Quick tip: If you set the environment variable `FONTTOOLS_LOOKUP_DEBUGGING=1` before running fontmake, Crowbar will also tell you the name and source location of all the lookups that get processed.
+
 ## Technical details and Developing
 
 Crowbar is a [React](https://reactjs.org) JavaScript application. It uses [harfbuzzjs](https://github.com/harfbuzz/harfbuzzjs) for shaping; Harfbuzz is the leading open source text shaping engine and is representative of how text will appear in a conforming OpenType implementation. It also uses [opentype.js](https://opentype.js.org) to extract information from the OpenType font format.
