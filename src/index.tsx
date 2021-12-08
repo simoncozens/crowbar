@@ -11,7 +11,7 @@ import hbjs from "./hbjs";
 declare let window: any;
 
 const store = createStore(appReducer, applyMiddleware(thunk));
-fetch("/harfbuzz.wasm")
+fetch(`${process.env.PUBLIC_URL}/harfbuzz.wasm`)
   .then((response) => response.arrayBuffer())
   .then((bytes) => WebAssembly.instantiate(bytes))
   .then((results) => {
