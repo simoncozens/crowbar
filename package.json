@@ -1,8 +1,9 @@
 {
   "name": "crowbar",
-  "homepage": "/crowbar/",
+  "homepage": "./",
   "version": "0.2.2",
   "private": true,
+  "main": "public/electron.js",
   "dependencies": {
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
@@ -21,7 +22,9 @@
     "@types/react-redux": "^7.1.12",
     "@types/redux-thunk": "^2.1.0",
     "clsx": "^1.1.1",
+    "concurrently": "^6.5.1",
     "deep-diff": "^1.0.2",
+    "electron-is-dev": "^2.0.0",
     "material-ui-dropzone": "^3.5.0",
     "opentype.js": "github:simoncozens/opentype.js#crowbar",
     "react": "^17.0.0",
@@ -31,14 +34,18 @@
     "react-scripts": "^4.0.3",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
-    "typescript": "~4.4.3"
+    "typescript": "~4.4.3",
+    "wait-on": "^6.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.{js,ts,tsx}"
+    "lint": "eslint src/**/*.{js,ts,tsx}",
+    "electron-dev": "concurrently \"BROWSER=none npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-package": "./node_modules/.bin/electron-builder -c.extraMetadata.main=build/electron.js",
+    "preelectron-package": "npm run build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -65,6 +72,8 @@
     "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "electron": "^16.0.5",
+    "electron-builder": "^22.14.5"
   }
 }
