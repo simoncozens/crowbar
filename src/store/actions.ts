@@ -1,4 +1,12 @@
+import isElectron from "is-electron";
 import { CrowbarFont } from "../opentype/CrowbarFont";
+
+declare let window: any;
+
+declare interface File extends Blob {
+  name: string;
+  path: string;
+}
 
 export const ADDED_FONT = "ADDED_FONT";
 export const CHANGED_TEXT = "CHANGED_TEXT";
@@ -76,6 +84,15 @@ export const addedFontActionInternal = (font: CrowbarFont) => ({
 export function addedFontAction(fontFile: File) {
   return (dispatch: any) => {
     new Promise((resolve) => {
+      if (isElectron()) {
+        /* eslint-disable @typescript-eslint/dot-notation */
+        window.api.send("toMain", {
+          type: "new font",
+          fileName: fontFile.name,
+          filePath: fontFile.path,
+        });
+      }
+
       const fr = new FileReader();
       fr.onload = () => {
         resolve(fr.result);

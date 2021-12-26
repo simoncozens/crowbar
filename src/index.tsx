@@ -4,6 +4,7 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
+import isElectron from "is-electron";
 import App from "./App";
 import appReducer from "./store/reducer";
 import hbjs from "./hbjs";
@@ -20,6 +21,15 @@ fetch(`${process.env.PUBLIC_URL}/harfbuzz.wasm`)
     const hb = hbjs(results.instance); // Dirty but works
     window.harfbuzz = results.instance;
     window.hbjs = hb;
+
+    if (isElectron()) {
+      console.log("Hello electron world");
+      window.api.send("toMain", {
+        type: "Hi dad",
+      });
+    } else {
+      console.log("Hello browser world");
+    }
 
     ReactDOM.render(
       <React.StrictMode>
