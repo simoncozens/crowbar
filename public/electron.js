@@ -20,6 +20,7 @@ const createWindow = () => {
       contextIsolation: true, // protect against prototype pollution
       enableRemoteModule: false, // turn off remote
       preload: __dirname + "/preload.js",
+      devTools: false,
     },
   });
   const appUrl = isDev
