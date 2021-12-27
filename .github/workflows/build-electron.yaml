@@ -4,10 +4,8 @@ on:
     branches:
       - electron
 jobs:
-  release:
+  build:
     runs-on: ${{ matrix.os }}
-    env:
-      NODE_OPTIONS: --openssl-legacy-provider
 
     strategy:
       matrix:
@@ -21,9 +19,9 @@ jobs:
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
-          node-version: 17
+          node-version: 16
 
-      - name: Build/release Electron app
+      - name: Build Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.github_token }}
