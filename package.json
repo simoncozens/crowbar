@@ -2,9 +2,14 @@
   "name": "crowbar",
   "homepage": "./",
   "version": "0.2.2",
+  "author": "Simon Cozens",
+  "description": "OpenType layout debugger",
   "private": true,
   "main": "public/electron.js",
-  "dependencies": {},
+  "dependencies": {
+    "electron-is-dev": "^2.0.0",
+    "chokidar": "^3.5.2"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -63,14 +68,21 @@
     "@types/react-dom": "^16.9.10",
     "@types/react-redux": "^7.1.12",
     "@types/redux-thunk": "^2.1.0",
-    "chokidar": "^3.5.2",
     "clsx": "^1.1.1",
     "deep-diff": "^1.0.2",
-    "electron-is-dev": "^2.0.0",
     "is-electron": "^2.2.1",
     "material-ui-dropzone": "^3.5.0",
     "opentype.js": "github:simoncozens/opentype.js#crowbar",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0"
+  },
+  "build": {
+    "appId": "uk.co.corvelsoftware.crowbar",
+    "productName": "Crowbar",
+    "copyright": "Copyright © 2021 ${author}",
+    "mac": {
+      "icon": "./public/icons/crowbar.icns",
+      "category": "public.app-category.utilities"
+    }
   }
 }
