@@ -38,7 +38,6 @@ fetch(`${process.env.PUBLIC_URL}/harfbuzz.wasm`)
     window.hbjs = hb;
 
     if (isElectron()) {
-      console.log("Hello electron world");
       window.api.send("toMain", {
         type: "Hi dad",
       });
