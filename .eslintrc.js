@@ -24,7 +24,6 @@ module.exports = {
     ],
     "@typescript-eslint/comma-dangle": "off",
     "react/jsx-wrap-multilines": "off",
-    "prettier/prettier": "error",
   },
   parserOptions: {
     project: "./tsconfig.json",
