@@ -9,14 +9,7 @@ module.exports = {
   plugins: ["jsx-a11y", "prettier"],
   rules: {
     quotes: "off",
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        devDependencies: false,
-        optionalDependencies: false,
-        peerDependencies: false,
-      },
-    ],
+    "import/no-extraneous-dependencies": "off",
     "@typescript-eslint/quotes": ["error", "double"],
     "react/jsx-filename-extension": [
       1,
