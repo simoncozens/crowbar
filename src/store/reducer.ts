@@ -1,5 +1,6 @@
 import {
   ADDED_FONT,
+  REFRESHED_FONT,
   CHANGED_TEXT,
   CHANGED_FONT,
   CHANGED_DRAWER_STATE,
@@ -40,6 +41,11 @@ export default function appReducer(state = initialState, action: any) {
         ...state,
         fonts: [...state.fonts, action.added_font],
         selected_font: state.fonts.length,
+      };
+    case REFRESHED_FONT:
+      return {
+        ...state,
+        fonts: [...state.fonts.slice(0, -1), action.added_font],
       };
     case CHANGED_FEATURE_STRING:
       return { ...state, featureString: action.featureString };

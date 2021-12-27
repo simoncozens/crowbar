@@ -6,6 +6,7 @@ const electron = require("electron"),
 const path = require("path"),
   isDev = require("electron-is-dev");
 const chokidar = require("chokidar");
+var fs = require("fs");
 
 let mainWindow;
 let watcher;
@@ -48,8 +49,23 @@ ipc.on("toMain", (event, args) => {
   if (args.type == "new font") {
     mainWindow.setTitle("Crowbar - " + args.fileName);
     watcher = chokidar.watch(args.filePath);
-    watcher.on("change", (path) =>
-      console.log(`File ${path} has been changed`)
-    );
+    watcher.on("change", (path) => {
+      console.log(`File ${path} has been changed`);
+      // Read the file
+      fs.readFile(path, (err, data) => {
+        if (err) {
+          return;
+        }
+        let ab = data.buffer.slice(
+          data.byteOffset,
+          data.byteOffset + data.byteLength
+        );
+        mainWindow.webContents.send("fromMain", {
+          type: "reload font",
+          filename: args.fileName,
+          content: ab,
+        });
+      });
+    });
   }
 });

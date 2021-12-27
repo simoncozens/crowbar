@@ -9,6 +9,7 @@ declare interface File extends Blob {
 }
 
 export const ADDED_FONT = "ADDED_FONT";
+export const REFRESHED_FONT = "REFRESHED_FONT";
 export const CHANGED_TEXT = "CHANGED_TEXT";
 export const CHANGED_FONT = "CHANGED_FONT";
 export const CHANGED_FEATURE_STATE = "CHANGED_FEATURE_STATE";
@@ -76,16 +77,46 @@ export const changedFontAction = (content: number) => ({
   selected_font: content,
 });
 
-export const addedFontActionInternal = (font: CrowbarFont) => ({
-  type: ADDED_FONT,
+export const addedFontActionInternal = (
+  font: CrowbarFont,
+  event_type: string
+) => ({
+  type: event_type,
   added_font: font,
 });
+
+export function addedFontFromArrayBuffer(
+  ab: ArrayBuffer,
+  filename: string,
+  dispatch: any,
+  event_type: string
+) {
+  const header = new Uint8Array(ab.slice(0, 4));
+  if (
+    header[0] === 116 && // t
+    header[1] === 116 && // t
+    header[2] === 99 && // f
+    header[3] === 102 // c
+  ) {
+    const count = new Uint8Array(ab.slice(11, 12))[0]; // If there are more than 255 I hate you
+    for (let i = 0; i < count; i += 1) {
+      const f = new CrowbarFont(`${filename}#${i}`, ab, i);
+      f.initOT((crowbarFont: CrowbarFont) => {
+        dispatch(addedFontActionInternal(crowbarFont, event_type));
+      });
+    }
+  } else {
+    const f = new CrowbarFont(filename, ab);
+    f.initOT((crowbarFont: CrowbarFont) => {
+      dispatch(addedFontActionInternal(crowbarFont, event_type));
+    });
+  }
+}
 
 export function addedFontAction(fontFile: File) {
   return (dispatch: any) => {
     new Promise((resolve) => {
       if (isElectron()) {
-        /* eslint-disable @typescript-eslint/dot-notation */
         window.api.send("toMain", {
           type: "new font",
           fileName: fontFile.name,
@@ -98,29 +129,14 @@ export function addedFontAction(fontFile: File) {
         resolve(fr.result);
       };
       fr.readAsArrayBuffer(fontFile);
-    }).then((result) => {
-      const ab = result as ArrayBuffer;
-      const header = new Uint8Array(ab.slice(0, 4));
-      if (
-        header[0] === 116 && // t
-        header[1] === 116 && // t
-        header[2] === 99 && // f
-        header[3] === 102 // c
-      ) {
-        const count = new Uint8Array(ab.slice(11, 12))[0]; // If there are more than 255 I hate you
-        for (let i = 0; i < count; i += 1) {
-          const f = new CrowbarFont(`${fontFile.name}#${i}`, ab, i);
-          f.initOT((crowbarFont: CrowbarFont) => {
-            dispatch(addedFontActionInternal(crowbarFont));
-          });
-        }
-      } else {
-        const f = new CrowbarFont(fontFile.name, ab);
-        f.initOT((crowbarFont: CrowbarFont) => {
-          dispatch(addedFontActionInternal(crowbarFont));
-        });
-      }
-    });
+    }).then((result) =>
+      addedFontFromArrayBuffer(
+        result as ArrayBuffer,
+        fontFile.name,
+        dispatch,
+        ADDED_FONT
+      )
+    );
   };
 }
 

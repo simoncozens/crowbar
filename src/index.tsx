@@ -8,10 +8,25 @@ import isElectron from "is-electron";
 import App from "./App";
 import appReducer from "./store/reducer";
 import hbjs from "./hbjs";
+import { addedFontFromArrayBuffer, REFRESHED_FONT } from "./store/actions";
 
 declare let window: any;
 
 const store = createStore(appReducer, applyMiddleware(thunk));
+
+if (isElectron()) {
+  window.api.receive("fromMain", (data: any) => {
+    if (data.type === "reload font") {
+      addedFontFromArrayBuffer(
+        data.content,
+        data.filename,
+        store.dispatch,
+        REFRESHED_FONT
+      );
+    }
+  });
+}
+
 fetch(`${process.env.PUBLIC_URL}/harfbuzz.wasm`)
   .then((response) => response.arrayBuffer())
   .then((bytes) => WebAssembly.instantiate(bytes))
@@ -27,8 +42,6 @@ fetch(`${process.env.PUBLIC_URL}/harfbuzz.wasm`)
       window.api.send("toMain", {
         type: "Hi dad",
       });
-    } else {
-      console.log("Hello browser world");
     }
 
     ReactDOM.render(
