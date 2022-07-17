@@ -37,11 +37,12 @@ const NavBar = (props: PropsFromRedux) => {
   };
   const onDrop = useCallback(
     (acceptedFiles) => {
+      const name = acceptedFiles[0].name.toLowerCase();
       if (
-        !acceptedFiles[0].name.endsWith(".otf") &&
-        !acceptedFiles[0].name.endsWith(".ttf") &&
-        !acceptedFiles[0].name.endsWith(".ttc") &&
-        !acceptedFiles[0].name.endsWith(".otc")
+        !name.endsWith(".otf") &&
+        !name.endsWith(".ttf") &&
+        !name.endsWith(".ttc") &&
+        !name.endsWith(".otc")
       ) {
         setShaking(true);
       } else {
