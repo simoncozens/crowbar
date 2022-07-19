@@ -14,7 +14,7 @@ jobs:
           ref: emscripten
       - uses: mymindstorm/setup-emsdk@v11
       - name: Ugly patch
-        run: cd harfbuzzjs/harfbuzz/ ; patch -p0 < ../../.github/harfbuzz-trace.patch
+        run: cd harfbuzzjs/harfbuzz/ ; patch -p1 < ../../.github/harfbuzz-trace.patch
       - name: Build
         run: cd harfbuzzjs ; sh build.sh
       - name: Archive artifacts
