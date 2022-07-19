@@ -11,7 +11,6 @@ jobs:
           repository: harfbuzz/harfbuzzjs
           path: harfbuzzjs
           submodules: recursive
-          ref: emscripten
       - uses: mymindstorm/setup-emsdk@v11
       - name: Ugly patch
         run: cd harfbuzzjs/harfbuzz/ ; patch -p1 < ../../.github/harfbuzz-trace.patch
