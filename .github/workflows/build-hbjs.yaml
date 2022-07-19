@@ -1,4 +1,5 @@
 on: push
+name: Build our patched harfbuzzjs
 jobs:
   build-hbjs:
     runs-on: ubuntu-latest
@@ -11,8 +12,7 @@ jobs:
           path: harfbuzzjs
           submodules: recursive
           ref: emscripten
-      - name: Install emscripten
-        run: apt-get update && apt-get install emscripten
+      - uses: mymindstorm/setup-emsdk@v11
       - name: Ugly patch
         run: cd harfbuzzjs/harfbuzz/ ; patch -p0 < ../../.github/harfbuzz-trace.patch
       - name: Build
