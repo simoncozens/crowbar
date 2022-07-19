@@ -16,7 +16,6 @@ fetch(`${process.env.PUBLIC_URL}/harfbuzz.wasm`)
   .then((bytes) => WebAssembly.instantiate(bytes))
   .then((results) => {
     // @ts-ignore
-    results.instance.exports.memory.grow(800);
     const hb = hbjs(results.instance); // Dirty but works
     window.harfbuzz = results.instance;
     window.hbjs = hb;
