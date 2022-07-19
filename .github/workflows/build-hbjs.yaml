@@ -1,0 +1,25 @@
+on: push
+jobs:
+  build-hbjs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout harfbuzzjs
+        uses: actions/checkout@v3
+        with:
+          repository: harfbuzz/harfbuzzjs
+          path: harfbuzzjs
+          submodules: recursive
+          ref: emscripten
+      - name: Install emscripten
+        run: apt-get update && apt-get install emscripten
+      - name: Ugly patch
+        run: cd harfbuzzjs/harfbuzz/ ; patch -p0 < ../../.github/harfbuzz-trace.patch
+      - name: Build
+        run: cd harfbuzzjs ; sh build.sh
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: harfbuzz.wasm
+          path: harfbuzzjs/hb.wasm
+
