@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const BigTextBox = (props: PropsFromRedux) => {
-  const { font } = props;
+  const { font, changedTextAction: connectedChangedTextAction } = props;
   const classes = useStyles();
   let restyle;
   if (font) {
@@ -31,7 +31,7 @@ const BigTextBox = (props: PropsFromRedux) => {
   }
   const handleChange = (e: any) => {
     const { value } = e.target;
-    props.changedTextAction(value);
+    connectedChangedTextAction(value);
   };
   return (
     <Input

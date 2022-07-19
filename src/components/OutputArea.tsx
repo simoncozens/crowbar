@@ -73,7 +73,7 @@ const OutputArea = (props: PropsFromRedux) => {
   let stage = "GSUB";
   let lastRow: HBGlyph[] = [];
   let rowid = 0;
-  const { font, text } = props;
+  const { font, text, clusterLevel } = props;
 
   if (!(font && font.hbFont && text)) {
     return <div />;
@@ -100,7 +100,7 @@ const OutputArea = (props: PropsFromRedux) => {
     // console.log(row.m, row.t);
     let m = row.m.match(/Start of shaping/);
     if (m) {
-      return props.clusterLevel === 2 ? (
+      return clusterLevel === 2 ? (
         <TableRow key={rowid++}>
           <TableCell> Pre-shaping</TableCell>
           <TableCell>

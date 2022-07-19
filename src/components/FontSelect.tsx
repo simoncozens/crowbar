@@ -22,9 +22,13 @@ const connector = connect(mapStateToProps, { changedFontAction });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const FontSelect = (props: PropsFromRedux) => {
-  const { fonts, selectedFontIndex } = props;
+  const {
+    fonts,
+    selectedFontIndex,
+    changedFontAction: connectedChangedFontAction,
+  } = props;
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    props.changedFontAction(event.target.value as number);
+    connectedChangedFontAction(event.target.value as number);
   };
   const useStyles = makeStyles((theme: Theme) =>
     createStyles({
