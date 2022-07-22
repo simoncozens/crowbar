@@ -33,6 +33,7 @@ const mapStateToProps = (state: CrowbarState) => {
     featureString: state.featureString,
     clusterLevel: state.clusterLevel,
     direction: state.direction,
+    variations: state.variations,
     script: state.script,
     language: state.language,
     bufferFlag: state.bufferFlag,

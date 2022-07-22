@@ -35,6 +35,12 @@ export interface ShapingOptions {
   showAllLookups: boolean;
 }
 
+export interface Axis {
+  min: number;
+  max: number;
+  default: number;
+}
+
 function onlyUnique(value: any, index: number, self: any) {
   return self.indexOf(value) === index;
 }
@@ -80,6 +86,8 @@ export class CrowbarFont {
 
   supportedLanguages: Set<string>;
 
+  axes?: Map<string, Axis>;
+
   constructor(name: string, fontBlob?: ArrayBuffer, faceIdx: number = 0) {
     this.name = name;
     this.supportedLanguages = new Set();
@@ -93,6 +101,7 @@ export class CrowbarFont {
       const blob = hbjs.createBlob(fontBlob);
       const face = hbjs.createFace(blob, faceIdx);
       this.hbFont = hbjs.createFont(face);
+      this.axes = face.getAxisInfos();
       const debgTable = face.reference_table("Debg");
       if (debgTable) {
         this.debugInfo = JSON.parse(new TextDecoder("utf8").decode(debgTable));
@@ -355,5 +364,9 @@ export class CrowbarFont {
     const box = maingroup.bbox();
     totalSVG.viewbox(box.x, box.y, box.width, box.height);
     return totalSVG;
+  }
+
+  setVariations(variations: Map<string, number>) {
+    this.hbFont.setVariations(variations);
   }
 }

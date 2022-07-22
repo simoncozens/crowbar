@@ -6,6 +6,7 @@ function hbjs(instance) {
   var heapu8 = new Uint8Array(exports.memory.buffer);
   var heapu32 = new Uint32Array(exports.memory.buffer);
   var heapi32 = new Int32Array(exports.memory.buffer);
+  var heapf32 = new Float32Array(exports.memory.buffer);
   var utf8Decoder = new TextDecoder("utf8");
 
   var HB_MEMORY_MODE_WRITABLE = 2;
@@ -17,6 +18,15 @@ function hbjs(instance) {
       ((s.charCodeAt(2) & 0xff) << 8) |
       ((s.charCodeAt(3) & 0xff) << 0)
     );
+  }
+
+  function _hb_untag(tag) {
+    return [
+      String.fromCharCode((tag >> 24) & 0xff),
+      String.fromCharCode((tag >> 16) & 0xff),
+      String.fromCharCode((tag >> 8) & 0xff),
+      String.fromCharCode((tag >> 0) & 0xff),
+    ].join("");
   }
 
   function _buffer_flag(s) {
@@ -71,8 +81,10 @@ function hbjs(instance) {
    **/
   function createFace(blob, index) {
     var ptr = exports.hb_face_create(blob.ptr, index);
+    const upem = exports.hb_face_get_upem(ptr);
     return {
       ptr: ptr,
+      upem,
       /**
        * Return the binary contents of an OpenType table.
        * @param {string} table Table name
@@ -86,6 +98,26 @@ function hbjs(instance) {
         var blobptr = exports.hb_blob_get_data(blob, null);
         var table_string = heapu8.subarray(blobptr, blobptr + length);
         return table_string;
+      },
+      /**
+       * Return variation axis infos
+       */
+      getAxisInfos: function () {
+        var axis = exports.malloc(64 * 32);
+        var c = exports.malloc(4);
+        heapu32[c / 4] = 64;
+        exports.hb_ot_var_get_axis_infos(ptr, 0, c, axis);
+        var result = {};
+        Array.from({ length: heapu32[c / 4] }).forEach(function (_, i) {
+          result[_hb_untag(heapu32[axis / 4 + i * 8 + 1])] = {
+            min: heapf32[axis / 4 + i * 8 + 4],
+            default: heapf32[axis / 4 + i * 8 + 5],
+            max: heapf32[axis / 4 + i * 8 + 6],
+          };
+        });
+        exports.free(c);
+        exports.free(axis);
+        return result;
       },
       /**
        * Free the object.
@@ -165,6 +197,20 @@ function hbjs(instance) {
         exports.hb_font_set_scale(ptr, xScale, yScale);
       },
       /**
+       * Set the font's variations.
+       * @param {object} variations Dictionary of variations to set
+       **/
+      setVariations: function (variations) {
+        var entries = Object.entries(variations);
+        var vars = exports.malloc(8 * entries.length);
+        entries.forEach(function (entry, i) {
+          heapu32[vars / 4 + i * 2 + 0] = hb_tag(entry[0]);
+          heapf32[vars / 4 + i * 2 + 1] = entry[1];
+        });
+        exports.hb_font_set_variations(ptr, vars, entries.length);
+        exports.free(vars);
+      },
+      /**
        * Free the object.
        */
       destroy: function () {
@@ -187,6 +233,19 @@ function hbjs(instance) {
     };
   }
 
+  function createJsString(text) {
+    const ptr = exports.malloc(text.length * 2);
+    const words = new Uint16Array(exports.memory.buffer, ptr, text.length);
+    for (let i = 0; i < words.length; ++i) words[i] = text.charCodeAt(i);
+    return {
+      ptr: ptr,
+      length: words.length,
+      free: function () {
+        exports.free(ptr);
+      },
+    };
+  }
+
   /**
    * Create an object representing a Harfbuzz buffer.
    **/
@@ -199,8 +258,8 @@ function hbjs(instance) {
        * @param {string} text Text to be added to the buffer.
        **/
       addText: function (text) {
-        var str = createCString(text);
-        exports.hb_buffer_add_utf8(ptr, str.ptr, str.length, 0, str.length);
+        const str = createJsString(text);
+        exports.hb_buffer_add_utf16(ptr, str.ptr, str.length, 0, str.length);
         str.free();
       },
       /**
@@ -289,12 +348,14 @@ function hbjs(instance) {
        *   - ax: Advance width (width to advance after this glyph is painted)
        *   - ay: Advance height (height to advance after this glyph is painted)
        *   - dx: X displacement (adjustment in X dimension when painting this glyph)
-       *   - d5: Y displacement (adjustment in Y dimension when painting this glyph)
+       *   - dy: Y displacement (adjustment in Y dimension when painting this glyph)
+       *   - flags: Glyph flags like `HB_GLYPH_FLAG_UNSAFE_TO_BREAK` (0x1)
        **/
-      json: function (font) {
+      json: function () {
         var length = exports.hb_buffer_get_length(ptr);
         var result = [];
-        var infosPtr32 = exports.hb_buffer_get_glyph_infos(ptr, 0) / 4;
+        var infosPtr = exports.hb_buffer_get_glyph_infos(ptr, 0);
+        var infosPtr32 = infosPtr / 4;
         var positionsPtr32 = exports.hb_buffer_get_glyph_positions(ptr, 0) / 4;
         var infos = heapu32.subarray(infosPtr32, infosPtr32 + 5 * length);
         var positions = heapi32.subarray(
@@ -309,6 +370,7 @@ function hbjs(instance) {
             ay: positions[i * 5 + 1],
             dx: positions[i * 5 + 2],
             dy: positions[i * 5 + 3],
+            flags: exports.hb_glyph_info_get_glyph_flags(infosPtr + i * 20),
           });
         }
         return result;

@@ -7,6 +7,7 @@ export const CHANGED_FEATURE_STATE = "CHANGED_FEATURE_STATE";
 export const CHANGED_FEATURE_STRING = "CHANGED_FEATURE_STRING";
 export const CHANGED_DRAWER_STATE = "CHANGED_DRAWER_STATE";
 export const CHANGED_CLUSTER_LEVEL = "CHANGED_CLUSTER_LEVEL";
+export const CHANGED_VARIATIONS = "CHANGED_VARIATIONS";
 export const CHANGED_DIRECTION = "CHANGED_DIRECTION";
 export const CHANGED_SCRIPT = "CHANGED_SCRIPT";
 export const CHANGED_LANGUAGE = "CHANGED_LANGUAGE";
@@ -46,6 +47,11 @@ export const changedBufferFlag = (bufferFlag: string[]) => ({
 export const changedClusterLevel = (content: number) => ({
   type: CHANGED_CLUSTER_LEVEL,
   clusterLevel: content,
+});
+
+export const changedVariations = (content: Map<string, number>) => ({
+  type: CHANGED_VARIATIONS,
+  variations: { ...content },
 });
 
 export const changedShowAllLookups = (show: boolean) => ({
@@ -120,6 +126,7 @@ export interface CrowbarState {
   language: string;
   bufferFlag: string[];
   showAllLookups: boolean;
+  variations: any;
 }
 
 export const initialState: CrowbarState = {
@@ -130,6 +137,7 @@ export const initialState: CrowbarState = {
   features: {},
   featureString: "",
   clusterLevel: 0,
+  variations: {},
   direction: "auto",
   script: "",
   language: "",

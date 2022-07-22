@@ -11,6 +11,7 @@ import {
   CHANGED_CLUSTER_LEVEL,
   CHANGED_BUFFER_FLAG,
   CHANGED_SHOW_ALL_LOOKUPS,
+  CHANGED_VARIATIONS,
   initialState,
 } from "./actions";
 
@@ -23,6 +24,14 @@ export default function appReducer(state = initialState, action: any) {
       return { ...state, inputtext: action.inputtext };
     case CHANGED_CLUSTER_LEVEL:
       return { ...state, clusterLevel: action.clusterLevel };
+    case CHANGED_VARIATIONS:
+      if (
+        state.fonts[state.selected_font] &&
+        state.fonts[state.selected_font].axes
+      ) {
+        state.fonts[state.selected_font].setVariations(action.variations);
+      }
+      return { ...state, variations: action.variations };
     case CHANGED_BUFFER_FLAG:
       return { ...state, bufferFlag: action.bufferFlag };
     case CHANGED_DIRECTION:

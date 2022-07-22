@@ -12,6 +12,8 @@ import CancelIcon from "@material-ui/icons/Cancel";
 import IconButton from "@material-ui/core/IconButton";
 import Chip from "@material-ui/core/Chip";
 import Select from "@material-ui/core/Select";
+import Slider from "@material-ui/core/Slider";
+import Typography from "@material-ui/core/Typography";
 import FormControl from "@material-ui/core/FormControl";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -21,6 +23,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import Checkbox from "@material-ui/core/Checkbox";
 import {
   changedDrawerState,
+  changedVariations,
   changedDirection,
   changedScript,
   changedLanguage,
@@ -42,6 +45,7 @@ const mapStateToProps = (state: CrowbarState) => ({
   featureState: state.features,
   featureString: state.featureString,
   clusterLevel: state.clusterLevel,
+  variations: state.variations,
   direction: state.direction,
   script: state.script,
   language: state.language,
@@ -54,6 +58,7 @@ const connector = connect(mapStateToProps, {
   changedScript,
   changedLanguage,
   changedDrawerState,
+  changedVariations,
   changedFeatureState,
   changedClusterLevel,
   changedFeatureString,
@@ -67,6 +72,11 @@ const MyDrawer = (props: PropsFromRedux) => {
   const classes = useStyles();
   const handleDrawerClose = () => {
     props.changedDrawerState(false);
+  };
+  const handleVariationChange = (tag: string, value: number | number[]) => {
+    const state = props.variations;
+    state[tag] = value;
+    props.changedVariations(state);
   };
   const font: CrowbarFont = props.fonts[props.selectedFontIndex];
   const sortLanguages = (
@@ -158,6 +168,31 @@ const MyDrawer = (props: PropsFromRedux) => {
           </div>
         )}
       </div>
+    );
+  }
+  let axes;
+  if (font && font.axes) {
+    axes = (
+      <FormControl className={classes.formControl}>
+        <h2 className={classes.smallspace}>Variation Axes</h2>
+        {Object.entries(font.axes).map(([axistag, axis]) => (
+          <div>
+            <Typography>{axistag}</Typography>
+            <Slider
+              value={
+                typeof props.variations[axistag] === "number"
+                  ? props.variations[axistag]
+                  : axis.default
+              }
+              min={axis.min}
+              max={axis.max}
+              valueLabelDisplay="auto"
+              aria-labelledby="input-slider"
+              onChange={(e, v) => handleVariationChange(axistag, v)}
+            />
+          </div>
+        ))}
+      </FormControl>
     );
   }
 
@@ -263,6 +298,8 @@ const MyDrawer = (props: PropsFromRedux) => {
       />
       <Divider />
       {features}
+      {axes && <Divider />}
+      {axes}
       <Divider />
 
       <FormControl className={classes.formControl}>
