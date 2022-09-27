@@ -236,6 +236,7 @@ export class CrowbarFont {
         !options.showAllLookups &&
         (r.m.includes("attaching") ||
           r.m.includes("replacing") ||
+          r.m.includes("multiplying") ||
           r.m.includes("kerning"))
       ) {
         return;
