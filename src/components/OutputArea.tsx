@@ -11,6 +11,7 @@ import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
 import { diff, Diff, DiffEdit } from "deep-diff";
 import SubdirectoryArrowRightIcon from "@material-ui/icons/SubdirectoryArrowRight";
+import SubdirectoryArrowLeftIcon from "@material-ui/icons/SubdirectoryArrowLeft";
 import { paletteFor } from "../palette";
 import { SVGArea } from "./SVGArea";
 import { GlyphBox } from "./GlyphBox";
@@ -72,7 +73,7 @@ const OutputArea = (props: PropsFromRedux) => {
   >(null);
   const classes = useStyles();
   let stage = "GSUB";
-  let lastRow: HBGlyph[] = [];
+  let lastRow: StageMessage | null = null;
   let rowid = 0;
   const { font, text, clusterLevel } = props;
 
@@ -154,7 +155,7 @@ const OutputArea = (props: PropsFromRedux) => {
     let diffColors: string[];
     diffColors = [];
     if (lastRow) {
-      const diffarray = diff(lastRow, row.t);
+      const diffarray = diff(lastRow.t, row.t);
       if (diffarray) {
         diffColors = processDiffArray(diffarray);
       }
@@ -168,8 +169,7 @@ const OutputArea = (props: PropsFromRedux) => {
       featurename = font.getFeatureForIndex(ix, stage);
       debugInfo = font.getDebugInfo(ix, stage);
     }
-    lastRow = row.t;
-    return (
+    const output = (
       <TableRow
         key={rowid++}
         onMouseOver={(ev) => {
@@ -188,7 +188,12 @@ const OutputArea = (props: PropsFromRedux) => {
         data-lookup={ix}
       >
         <TableCell>
-          {row.depth > 1 && <SubdirectoryArrowRightIcon />}
+          {lastRow && row.depth > lastRow.depth && (
+            <SubdirectoryArrowRightIcon />
+          )}
+          {lastRow && row.depth < lastRow.depth && (
+            <SubdirectoryArrowLeftIcon />
+          )}
           {row.m}
           {featurename && <br />}
           {featurename && <b>{featurename}</b>}
@@ -211,9 +216,11 @@ const OutputArea = (props: PropsFromRedux) => {
         </TableCell>
       </TableRow>
     );
+    lastRow = row;
+    return output;
   };
 
-  lastRow = [];
+  lastRow = null;
   return (
     <div>
       {shaping[shaping.length - 1] && (

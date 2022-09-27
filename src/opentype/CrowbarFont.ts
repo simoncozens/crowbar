@@ -20,6 +20,7 @@ export interface StageMessage {
   m: string;
   t: HBGlyph[];
   depth: number;
+  effective: boolean;
 }
 
 export interface ShapingOptions {
@@ -183,36 +184,66 @@ export class CrowbarFont {
       options.stopAt,
       options.stopPhase
     );
-    result.unshift({ m: "Start of shaping", t: preshape, depth: 0 });
+    result.unshift({
+      m: "Start of shaping",
+      t: preshape,
+      depth: 0,
+      effective: true,
+    });
     const clustermap: number[] = [];
 
     // Set depths
     let depth = 0;
-    result.forEach((r: StageMessage) => {
-      if (r.m.startsWith("start lookup")) {
+    const startIds: number[] = [];
+    const startBuffers: string[] = [];
+    result.forEach((r: StageMessage, ix: number) => {
+      if (
+        r.m.startsWith("start lookup") ||
+        r.m.startsWith("recursing to lookup")
+      ) {
         depth += 1;
+        startIds.push(ix);
+        startBuffers.push(JSON.stringify(r.t));
       }
       r.depth = depth;
-      if (r.m.startsWith("end lookup")) {
+      if (
+        r.m.startsWith("end lookup") ||
+        r.m.startsWith("recursed to lookup")
+      ) {
         depth -= 1;
+        const startId = startIds.pop();
+        const startBuffer = startBuffers.pop();
+        if (startBuffer !== JSON.stringify(r.t) && startId !== undefined) {
+          // This was effective, and so was everything from start to end
+          let index;
+          for (index = startId; index <= ix; index += 1) {
+            result[index].effective = true;
+          }
+        }
       }
       remapClusters(r.t, clustermap);
     });
     // Reduce this
     const newResult: StageMessage[] = [];
     let lastBuf = "";
-    result.forEach((r: StageMessage, ix: number) => {
+    result.forEach((r: StageMessage) => {
       if (r.m.startsWith("start table") || r.m.endsWith("start table")) {
         r.t = [];
         newResult.push(r);
         return;
       }
       if (
+        !options.showAllLookups &&
+        (r.m.includes("attaching") ||
+          r.m.includes("replacing") ||
+          r.m.includes("kerning"))
+      ) {
+        return;
+      }
+      if (
         options.showAllLookups ||
         JSON.stringify(r.t) !== lastBuf ||
-        (r.m.startsWith("start lookup") &&
-          result[ix + 1] &&
-          result[ix + 1].depth! > r.depth!)
+        r.effective
       ) {
         lastBuf = JSON.stringify(r.t);
         newResult.push(r);
@@ -221,7 +252,12 @@ export class CrowbarFont {
     const endbuffer = buffer.json();
     buffer.destroy();
     remapClusters(endbuffer, clustermap);
-    newResult.push({ m: "End of shaping", t: endbuffer, depth: 0 });
+    newResult.push({
+      m: "End of shaping",
+      t: endbuffer,
+      depth: 0,
+      effective: true,
+    });
     newResult.forEach((r) => {
       r.t.forEach((t) => {
         if (!t.ax || t.ax === 0) {
