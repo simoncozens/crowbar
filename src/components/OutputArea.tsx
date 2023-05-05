@@ -123,8 +123,7 @@ const OutputArea = (props: PropsFromRedux) => {
         <div />
       );
     }
-    m = row.m.match(/(start|end).*(normalize|preprocess)/);
-    if (m && row.t[0]) {
+    if (!row.glyphs && row.t[0]) {
       return (
         <TableRow key={rowid++}>
           <TableCell>{row.m}</TableCell>

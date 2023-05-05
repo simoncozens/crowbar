@@ -20,6 +20,7 @@ export interface StageMessage {
   m: string;
   t: HBGlyph[];
   depth: number;
+  glyphs: boolean;
   effective: boolean;
 }
 
@@ -189,6 +190,7 @@ export class CrowbarFont {
       t: preshape,
       depth: 0,
       effective: true,
+      glyphs: false,
     });
     const clustermap: number[] = [];
 
@@ -258,6 +260,7 @@ export class CrowbarFont {
       t: endbuffer,
       depth: 0,
       effective: true,
+      glyphs: true,
     });
     newResult.forEach((r) => {
       r.t.forEach((t) => {
