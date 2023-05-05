@@ -12,8 +12,8 @@ jobs:
           path: harfbuzzjs
           submodules: recursive
       - uses: mymindstorm/setup-emsdk@v11
-      - name: Export thing
-        run: cd harfbuzzjs; echo "_hb_buffer_get_content_type" >> hbjs.symbols
+      - name: Ugly patch
+        run: cd harfbuzzjs/ ; patch -p1 < ../../.github/hbjs-buffertype.patch
       - name: Build
         run: cd harfbuzzjs ; sh build.sh
       - name: Archive artifacts
