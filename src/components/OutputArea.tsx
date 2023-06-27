@@ -74,6 +74,7 @@ const OutputArea = (props: PropsFromRedux) => {
   const classes = useStyles();
   let stage = "GSUB";
   let lastRow: StageMessage | null = null;
+  let lastIndex: number | null = null;
   let rowid = 0;
   const { font, text, clusterLevel } = props;
 
@@ -159,18 +160,21 @@ const OutputArea = (props: PropsFromRedux) => {
         diffColors = processDiffArray(diffarray);
       }
     }
-    const m2 = row.m.match(/lookup (\d+)/);
+    // Top level lookup - save state externally
+    const m3 = row.m.match(/^start lookup (\d+) feature '(\w+)'/);
     let featurename = "";
     let debugInfo = null;
-    let ix = 0;
-    if (m2) {
-      ix = parseInt(m2[1], 10);
-      featurename = font.getFeatureForIndex(ix, stage);
-      debugInfo = font.getDebugInfo(ix, stage);
+    let style;
+    if (m3) {
+      style = { borderTop: "solid 2px #777" } as React.CSSProperties;
+      featurename = m3[2];
+      lastIndex = parseInt(m3[1], 10);
+      debugInfo = font.getDebugInfo(lastIndex, stage);
     }
     const output = (
       <TableRow
         key={rowid++}
+        style={style}
         onMouseOver={(ev) => {
           let el = ev.target as HTMLElement;
           while (el.tagName !== "TR" && el.parentElement) {
@@ -184,7 +188,7 @@ const OutputArea = (props: PropsFromRedux) => {
         }}
         onMouseLeave={() => setGlyphStringToBeDrawn(null)}
         data-stage={stage}
-        data-lookup={ix}
+        data-lookup={lastIndex}
       >
         <TableCell>
           {lastRow && row.depth > lastRow.depth && (
