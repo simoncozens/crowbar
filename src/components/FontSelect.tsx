@@ -4,7 +4,7 @@ import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import InputLabel from "@material-ui/core/InputLabel";
 import {
-  fade,
+  alpha,
   makeStyles,
   createStyles,
   Theme,
@@ -35,9 +35,9 @@ const FontSelect = (props: PropsFromRedux) => {
       fontSelect: {
         position: "relative",
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: fade(theme.palette.common.white, 0.15),
+        backgroundColor: alpha(theme.palette.common.white, 0.15),
         "&:hover": {
-          backgroundColor: fade(theme.palette.common.white, 0.25),
+          backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
         marginRight: 0,
         marginLeft: theme.spacing(1),

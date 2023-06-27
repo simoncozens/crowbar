@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {
-  createMuiTheme,
+  createTheme,
   ThemeProvider,
   makeStyles,
 } from "@material-ui/core/styles";
@@ -62,7 +62,7 @@ const App = (props: PropsFromRedux) => {
 
   const theme = React.useMemo(
     () =>
-      createMuiTheme({
+      createTheme({
         palette: {
           type: prefersDarkMode ? "dark" : "light",
         },
