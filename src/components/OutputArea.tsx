@@ -162,6 +162,7 @@ const OutputArea = (props: PropsFromRedux) => {
     }
     // Top level lookup - save state externally
     const m3 = row.m.match(/^start lookup (\d+) feature '(\w+)'/);
+    const m4 = row.m.match(/^recursing to lookup (\d+)/);
     let featurename = "";
     let debugInfo = null;
     let style;
@@ -169,6 +170,10 @@ const OutputArea = (props: PropsFromRedux) => {
       style = { borderTop: "solid 2px #777" } as React.CSSProperties;
       featurename = m3[2];
       lastIndex = parseInt(m3[1], 10);
+      debugInfo = font.getDebugInfo(lastIndex, stage);
+    }
+    if (m4) {
+      lastIndex = parseInt(m4[1], 10);
       debugInfo = font.getDebugInfo(lastIndex, stage);
     }
     const output = (
