@@ -38,6 +38,8 @@ import { CrowbarFont } from "../opentype/CrowbarFont";
 import { useStyles } from "../navbarstyles";
 import { harfbuzzScripts, opentypeLanguages } from "../opentype/constants";
 
+declare let window: any;
+
 const mapStateToProps = (state: CrowbarState) => ({
   open: state.drawerOpen,
   fonts: state.fonts,
@@ -337,19 +339,27 @@ const MyDrawer = (props: PropsFromRedux) => {
           </MenuItem>
         </Select>
       </FormControl>
-      <FormControlLabel
-        control={
-          <Checkbox
-            name="show-all-lookups"
-            checked={props.showAllLookups}
-            value={props.showAllLookups}
-            onChange={() => {
-              props.changedShowAllLookups(!props.showAllLookups);
-            }}
-          />
-        }
-        label="Show All Lookups"
-      />
+      <FormControl className={classes.formControl}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="show-all-lookups"
+              checked={props.showAllLookups}
+              value={props.showAllLookups}
+              onChange={() => {
+                props.changedShowAllLookups(!props.showAllLookups);
+              }}
+            />
+          }
+          label="Show All Lookups"
+        />
+        <div>
+          Crowbar is using
+          {window.hbjs && window.hbjs.version
+            ? ` Harfbuzz version ${window.hbjs.version}`
+            : " an unknown version of Harfbuzz"}
+        </div>
+      </FormControl>
     </Drawer>
   );
 };
