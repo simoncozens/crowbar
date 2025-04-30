@@ -356,7 +356,7 @@ const MyDrawer = (props: PropsFromRedux) => {
         <div>
           Crowbar is using
           {window.hbjs && window.hbjs.version
-            ? ` Harfbuzz version ${window.hbjs.version}`
+            ? ` Harfbuzz version ${window.hbjs.version_string()}`
             : " an unknown version of Harfbuzz"}
         </div>
       </FormControl>
