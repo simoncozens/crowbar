@@ -17,10 +17,21 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "noFallthroughCasesInSwitch": true
+    "jsx": "preserve",
+    "noFallthroughCasesInSwitch": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "src"
+    ".next/types/**/*.ts",
+    "src",
+    "build/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

@@ -1,26 +1,23 @@
-/* eslint-disable react/jsx-props-no-spreading,react/destructuring-assignment */
 import React from "react";
-import { useTheme } from "@material-ui/core/styles";
-
 import { connect, ConnectedProps } from "react-redux";
-import Drawer from "@material-ui/core/Drawer";
-import Divider from "@material-ui/core/Divider";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import CancelIcon from "@material-ui/icons/Cancel";
-import IconButton from "@material-ui/core/IconButton";
-import Chip from "@material-ui/core/Chip";
-import Select from "@material-ui/core/Select";
-import Slider from "@material-ui/core/Slider";
-import Typography from "@material-ui/core/Typography";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import InputLabel from "@material-ui/core/InputLabel";
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import Checkbox from "@material-ui/core/Checkbox";
+import Drawer from "@mui/material/Drawer";
+import Divider from "@mui/material/Divider";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+import Select from "@mui/material/Select";
+import Slider from "@mui/material/Slider";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import Checkbox from "@mui/material/Checkbox";
 import {
   changedDrawerState,
   changedVariations,
@@ -32,28 +29,29 @@ import {
   changedFeatureString,
   changedBufferFlag,
   changedShowAllLookups,
-  CrowbarState,
-} from "../store/actions";
+} from "../store/crowbarSlice";
+import { RootState } from "../store";
 import { CrowbarFont } from "../opentype/CrowbarFont";
 import { useStyles } from "../navbarstyles";
 import { harfbuzzScripts, opentypeLanguages } from "../opentype/constants";
+import { hbSingleton } from "../opentype/CrowbarFont";
 
-declare let window: any;
-
-const mapStateToProps = (state: CrowbarState) => ({
-  open: state.drawerOpen,
-  fonts: state.fonts,
-  selectedFontIndex: state.selected_font,
-  featureState: state.features,
-  featureString: state.featureString,
-  clusterLevel: state.clusterLevel,
-  variations: state.variations,
-  direction: state.direction,
-  script: state.script,
-  language: state.language,
-  bufferFlag: state.bufferFlag,
-  showAllLookups: state.showAllLookups,
-});
+const mapStateToProps = (state: RootState) => {
+  // console.log("Mapping state to props", state);
+  return {
+  open: state.crowbar.drawerOpen,
+  fonts: state.crowbar.fonts,
+  selectedFontIndex: state.crowbar.selected_font,
+  featureState: state.crowbar.features,
+  featureString: state.crowbar.featureString,
+  clusterLevel: state.crowbar.clusterLevel,
+  variations: state.crowbar.variations,
+  direction: state.crowbar.direction,
+  script: state.crowbar.script,
+  language: state.crowbar.language,
+  bufferFlag: state.crowbar.bufferFlag || [],
+  showAllLookups: state.crowbar.showAllLookups,
+}};
 
 const connector = connect(mapStateToProps, {
   changedDirection,
@@ -70,17 +68,16 @@ const connector = connect(mapStateToProps, {
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const MyDrawer = (props: PropsFromRedux) => {
-  const theme = useTheme();
   const classes = useStyles();
   const handleDrawerClose = () => {
     props.changedDrawerState(false);
   };
-  const handleVariationChange = (tag: string, value: number | number[]) => {
+  const handleVariationChange = (tag: string, value: number) => {
     const state = props.variations;
     state[tag] = value;
     props.changedVariations(state);
   };
-  const font: CrowbarFont = props.fonts[props.selectedFontIndex];
+  const font: CrowbarFont = (props.fonts || [])[props.selectedFontIndex];
   const sortLanguages = (
     a: Record<"label" | "tag", string>,
     b: Record<"label" | "tag", string>
@@ -178,7 +175,7 @@ const MyDrawer = (props: PropsFromRedux) => {
       <FormControl className={classes.formControl}>
         <h2 className={classes.smallspace}>Variation Axes</h2>
         {Object.entries(font.axes).map(([axistag, axis]) => (
-          <div>
+          <div key={axistag}>
             <Typography>{axistag}</Typography>
             <Slider
               value={
@@ -210,7 +207,7 @@ const MyDrawer = (props: PropsFromRedux) => {
     >
       <div className={classes.drawerHeader}>
         <IconButton onClick={handleDrawerClose}>
-          {theme.direction === "rtl" ? (
+          {document.dir == "rtl" ? (
             <ChevronLeftIcon />
           ) : (
             <ChevronRightIcon />
@@ -238,7 +235,7 @@ const MyDrawer = (props: PropsFromRedux) => {
         freeSolo
         id="script"
         options={harfbuzzScripts.sort(sortScripts)}
-        renderOption={(option) => (
+        renderOption={(props, option) => (
           <>
             <span className={classes.flag}>
               {font && font.supportedScripts.has(option.tag.toLowerCase())
@@ -271,7 +268,7 @@ const MyDrawer = (props: PropsFromRedux) => {
         freeSolo
         id="language"
         options={opentypeLanguages.sort(sortLanguages)}
-        renderOption={(option) => (
+        renderOption={(_props, option) => (
           <>
             <span className={classes.flag}>
               {font && font.supportedLanguages.has(option.tag) ? "✅" : " "}
@@ -355,8 +352,8 @@ const MyDrawer = (props: PropsFromRedux) => {
         />
         <div>
           Crowbar is using
-          {window.hbjs && window.hbjs.version
-            ? ` Harfbuzz version ${window.hbjs.version_string()}`
+          {hbSingleton && hbSingleton.version
+            ? ` Harfbuzz version ${hbSingleton.version_string()}`
             : " an unknown version of Harfbuzz"}
         </div>
       </FormControl>

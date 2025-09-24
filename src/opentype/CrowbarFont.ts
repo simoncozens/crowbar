@@ -1,10 +1,26 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 
-import { Font, load, Glyph, Path } from "opentype.js";
+import { Font, parse, Glyph, Path } from "opentype.js";
 import * as SVG from "@svgdotjs/svg.js";
 import { paletteFor } from "../palette";
 
-declare let window: any;
+export let hbSingleton: any = null;
+export async function initHB() {
+  if (hbSingleton) return hbSingleton;
+  const harfbuzzjs = await import("harfbuzzjs");
+  const hbPromise = harfbuzzjs;
+  if (typeof hbPromise === "function") {
+    hbSingleton = await hbPromise();
+  } else if (hbPromise && typeof hbPromise.then === "function") {
+    hbSingleton = await hbPromise;
+  } else {
+    hbSingleton = hbPromise;
+  }
+  if (!hbSingleton || typeof hbSingleton.createBuffer !== "function") {
+    throw new Error("Failed to initialize HarfBuzz: invalid API");
+  }
+  return hbSingleton;
+}
 
 export interface HBGlyph {
   g: number;
@@ -25,7 +41,7 @@ export interface StageMessage {
 }
 
 export interface ShapingOptions {
-  features: any;
+  features: Record<string, boolean | string>;
   featureString?: string;
   clusterLevel: number;
   stopAt: number;
@@ -43,7 +59,7 @@ export interface Axis {
   default: number;
 }
 
-function onlyUnique(value: any, index: number, self: any) {
+function onlyUnique<T>(value: T, index: number, self: T[]) {
   return self.indexOf(value) === index;
 }
 
@@ -82,7 +98,7 @@ export class CrowbarFont {
 
   otFont?: Font;
 
-  debugInfo?: any;
+  debugInfo?: Record<string, any>;
 
   supportedScripts: Set<string>;
 
@@ -99,43 +115,33 @@ export class CrowbarFont {
         fontBlob
       )}`;
       this.fontFace = `@font-face{font-family:"${name}"; src:url(${this.base64});}`;
-      const { hbjs } = window;
-      const blob = hbjs.createBlob(fontBlob);
-      const face = hbjs.createFace(blob, faceIdx);
-      this.hbFont = hbjs.createFont(face);
+      const blob = hbSingleton!.createBlob(fontBlob);
+      const face = hbSingleton!.createFace(blob, faceIdx);
+      this.hbFont = hbSingleton!.createFont(face);
       this.axes = face.getAxisInfos();
       const debgTable = face.reference_table("Debg");
       if (debgTable) {
-        this.debugInfo = JSON.parse(new TextDecoder("utf8").decode(debgTable));
-        this.debugInfo = this.debugInfo["com.github.fonttools.feaLib"];
+        this.debugInfo = JSON.parse(new TextDecoder("utf8").decode(debgTable))[
+          "com.github.fonttools.feaLib"
+        ];
+      }
+      this.otFont = parse(fontBlob);
+      if (this.otFont && this.otFont.tables.gsub) {
+        this.otFont.tables.gsub.scripts.forEach((script: any) => {
+          this.supportedScripts.add(script.tag);
+          if (script.script.langSysRecords) {
+            script.script.langSysRecords.forEach((lang: any) => {
+              this.supportedLanguages.add(lang.tag);
+            });
+          }
+        });
       }
     }
     return this;
   }
 
-  initOT(cb: any) {
-    const that = this;
-    load(this.base64 as string, (err, otFont) => {
-      that.otFont = otFont;
-      // if (err) {
-      //   console.log(err);
-      // }
-      if (otFont && otFont.tables.gsub) {
-        otFont.tables.gsub.scripts.forEach((script: any) => {
-          that.supportedScripts.add(script.tag);
-          if (script.script.langSysRecords) {
-            script.script.langSysRecords.forEach((lang: any) => {
-              that.supportedLanguages.add(lang.tag);
-            });
-          }
-        });
-      }
-      cb(that);
-    });
-  }
-
   getSVG(gid: number): any {
-    let svgText = this.hbFont.glyphToPath(gid);
+    let svgText = this.hbFont!.glyphToPath(gid);
     if (svgText.length < 10) {
       const glyph = this.getGlyph(gid);
       if (glyph) {
@@ -151,14 +157,13 @@ export class CrowbarFont {
   }
 
   shapeTrace(s: string, options: ShapingOptions): StageMessage[] {
-    const { hbjs } = window;
     let featurestring =
       options.featureString ||
       Object.keys(options.features)
         .map((f) => (options.features[f] ? "+" : "-") + f)
         .join(",");
     const font = this.hbFont;
-    const buffer = hbjs.createBuffer();
+    const buffer = hbSingleton.createBuffer();
     buffer.setClusterLevel(options.clusterLevel);
     buffer.addText(s);
     buffer.setFlags(options.bufferFlag);
@@ -178,7 +183,7 @@ export class CrowbarFont {
 
     const preshape = buffer.json();
 
-    const result: StageMessage[] = hbjs.shapeWithTrace(
+    const result: StageMessage[] = hbSingleton.shapeWithTrace(
       font,
       buffer,
       featurestring,
@@ -287,7 +292,8 @@ export class CrowbarFont {
     }
     try {
       return this.otFont.glyphs.get(gid);
-    } catch (error) {
+    } catch (e) {
+      console.error("Error getting glyph:", e);
       return null;
     }
   }
@@ -363,8 +369,7 @@ export class CrowbarFont {
     if (!this.otFont.tables.gdef) {
       return 0;
     }
-    // Types are wrong
-    // @ts-ignore
+    // @ts-expect-error Types are wrong
     return this.otFont.position.getGlyphClass(
       this.otFont.tables.gdef.classDef,
       ix
@@ -406,7 +411,7 @@ export class CrowbarFont {
     return totalSVG;
   }
 
-  setVariations(variations: Map<string, number>) {
+  setVariations(variations: Record<string, number>) {
     this.hbFont.setVariations(variations);
   }
 }

@@ -1,9 +1,8 @@
-/* eslint-disable react/jsx-one-expression-per-line */
 import React from "react";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
-import ArrowRightIcon from "@material-ui/icons/ArrowRight";
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import { CrowbarFont, HBGlyph } from "../opentype/CrowbarFont";
 import { paletteFor } from "../palette";
 
@@ -22,6 +21,7 @@ export const GlyphBox = ({ glyph, font, color }: GlyphBoxProps) => {
     }
   } catch (e) {
     // Stay at empty
+    console.log(e);
   }
 
   return (

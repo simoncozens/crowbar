@@ -1,17 +1,16 @@
-/* eslint-disable no-plusplus,prefer-destructuring,@typescript-eslint/indent,react/jsx-one-expression-per-line */
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { makeStyles } from "@mui/styles";
 import { diff, Diff, DiffEdit } from "deep-diff";
-import SubdirectoryArrowRightIcon from "@material-ui/icons/SubdirectoryArrowRight";
-import SubdirectoryArrowLeftIcon from "@material-ui/icons/SubdirectoryArrowLeft";
+import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
+import SubdirectoryArrowLeftIcon from "@mui/icons-material/SubdirectoryArrowLeft";
 import { paletteFor } from "../palette";
 import { SVGArea } from "./SVGArea";
 import { GlyphBox } from "./GlyphBox";
@@ -22,29 +21,30 @@ import {
   StageMessage,
   HBGlyph,
 } from "../opentype/CrowbarFont";
-import { CrowbarState } from "../store/actions";
+import { RootState } from "../store";
+import { useTheme } from "@mui/material";
 
-const mapStateToProps = (state: CrowbarState) => {
-  const font: CrowbarFont = state.fonts[state.selected_font];
-  const text: string = state.inputtext;
+const mapStateToProps = (state: RootState) => {
+  const font: CrowbarFont = state.crowbar.fonts[state.crowbar.selected_font];
+  const text: string = state.crowbar.inputtext;
   return {
     font,
     text,
-    features: state.features,
-    featureString: state.featureString,
-    clusterLevel: state.clusterLevel,
-    direction: state.direction,
-    variations: state.variations,
-    script: state.script,
-    language: state.language,
-    bufferFlag: state.bufferFlag,
-    showAllLookups: state.showAllLookups,
+    features: state.crowbar.features,
+    featureString: state.crowbar.featureString,
+    clusterLevel: state.crowbar.clusterLevel,
+    direction: state.crowbar.direction,
+    variations: state.crowbar.variations,
+    script: state.crowbar.script,
+    language: state.crowbar.language,
+    bufferFlag: state.crowbar.bufferFlag,
+    showAllLookups: state.crowbar.showAllLookups,
   };
 };
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   stageheader: {
-    backgroundColor: theme.palette.info.main,
+    backgroundColor: useTheme().palette.info.main,
   },
 }));
 
@@ -59,8 +59,7 @@ function processDiffArray(
     if (d.kind === "A") {
       output[d.index] = "glyphadded";
     } else if (d.kind === "E" || d.kind === "N") {
-      // @ts-ignore
-      output[(d as DiffEdit<HBGlyph[], HBGlyph[]>).path[0]] = "glyphmodified";
+      output[(d as DiffEdit<HBGlyph[], HBGlyph[]>).path![0]] = "glyphmodified";
     }
   });
   return output;
@@ -110,6 +109,7 @@ const OutputArea = (props: PropsFromRedux) => {
             {row.t.map((glyph) => (
               <div
                 className="glyphbox"
+                key={glyph.cl}
                 style={{
                   color: paletteFor(glyph.cl),
                 }}
@@ -130,7 +130,7 @@ const OutputArea = (props: PropsFromRedux) => {
           <TableCell>{row.m}</TableCell>
           <TableCell>
             {row.t.map((glyph) => (
-              <div className="glyphbox">
+              <div className="glyphbox" key={glyph.cl}>
                 U+
                 {glyph.g.toString(16).padStart(4, "0")}
               </div>
@@ -217,6 +217,7 @@ const OutputArea = (props: PropsFromRedux) => {
             <span
               onMouseEnter={() => setHighlightedGlyph(glyph.cl)}
               onMouseLeave={() => setHighlightedGlyph(-1)}
+              key={glyphIx}
             >
               <GlyphBox glyph={glyph} font={font} color={diffColors[glyphIx]} />
             </span>

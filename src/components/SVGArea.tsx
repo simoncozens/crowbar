@@ -7,7 +7,7 @@ export type SVGProps = {
   highlightedglyph: number;
 };
 
-function deleteAllChildren(e: any) {
+function deleteAllChildren(e: HTMLElement) {
   let child = e.lastElementChild;
   while (child) {
     e.removeChild(child);

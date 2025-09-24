@@ -1,23 +1,18 @@
 import React from "react";
 import clsx from "clsx";
 
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import {
-  createTheme,
-  ThemeProvider,
-  makeStyles,
-} from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import { makeStyles, ThemeProvider } from "@mui/styles";
+import { createTheme, StyledEngineProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import "./App.css";
 import { connect, ConnectedProps } from "react-redux";
 import NavBar from "./components/NavBar";
 import OutputArea from "./components/OutputArea";
 import BigTextBox from "./components/BigTextBox";
-import { CrowbarState } from "./store/actions";
 
-const mapStateToProps = (state: CrowbarState) => ({
-  fontFaces: state.fonts.map((x) => x.fontFace),
-  drawerOpen: state.drawerOpen,
+const mapStateToProps = (state: RootState) => ({
+  fontFaces: state.crowbar.fonts.map((x) => x.fontFace),
+  drawerOpen: state.crowbar.drawerOpen,
 });
 
 const connector = connect(mapStateToProps, {});
@@ -25,68 +20,87 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    alignContent: "center",
+import { Theme } from '@mui/material/styles';
+import { RootState } from "./store";
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface DefaultTheme extends Theme {}
+}
+
+const theme = createTheme({
+  colorSchemes: {
+    dark: true,
   },
-  drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-    justifyContent: "flex-start",
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#ff5252',
+    },
   },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginRight: -drawerWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: 0,
-  },
-}));
-const App = (props: PropsFromRedux) => {
+});
+
+const useStyles = makeStyles((theme) => {
+  return {
+    root: {
+      display: "flex",
+      alignContent: "center",
+    },
+    drawerHeader: {
+      display: "flex",
+      alignItems: "center",
+      padding: theme.spacing(0, 1),
+      // necessary for content to be below app bar
+      ...theme.mixins.toolbar,
+      justifyContent: "flex-start",
+    },
+    content: {
+      flexGrow: 1,
+      padding: theme.spacing(3),
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      marginRight: -drawerWidth,
+    },
+    contentShift: {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: 0,
+    },
+  };
+});
+
+function Component(props: PropsFromRedux) {
   const { fontFaces, drawerOpen } = props;
   const classes = useStyles();
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          type: prefersDarkMode ? "dark" : "light",
-        },
-      }),
-    [prefersDarkMode]
-  );
-
   return (
-    <ThemeProvider theme={theme}>
+    <div className={classes.root}>
       <style>{fontFaces.join("\n")}</style>
-      <div className={classes.root}>
-        <CssBaseline />
-        <main
-          className={clsx(classes.content, {
-            [classes.contentShift]: drawerOpen,
-          })}
-        >
-          <div className={classes.drawerHeader} />
-          <BigTextBox />
-          <OutputArea />
-        </main>
-        <NavBar />
-      </div>
+      <CssBaseline />
+      <main
+        className={clsx(classes.content, {
+          [classes.contentShift]: drawerOpen,
+        })}
+      >
+        <div className={classes.drawerHeader} />
+        <BigTextBox />
+        <OutputArea />
+      </main>
+      <NavBar />
+    </div>
+  );
+}
+
+const App = (props: PropsFromRedux) => {
+  return (
+    <StyledEngineProvider injectFirst>
+    <ThemeProvider theme={theme}>
+      <Component {...props} />
     </ThemeProvider>
+    </StyledEngineProvider>
   );
 };
 

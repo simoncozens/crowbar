@@ -1,24 +1,24 @@
-/* eslint-disable react/jsx-props-no-spreading,react/destructuring-assignment */
+ 
 import React, { useCallback } from "react";
 import clsx from "clsx";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import MenuIcon from "@material-ui/icons/Menu";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useDropzone } from "react-dropzone";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { connect, ConnectedProps } from "react-redux";
-import IconButton from "@material-ui/core/IconButton";
+import IconButton from "@mui/material/IconButton";
 import FontSelect from "./FontSelect";
 import { useStyles } from "../navbarstyles";
 import {
   addedFontAction,
-  CrowbarState,
   changedDrawerState,
-} from "../store/actions";
+} from "../store/crowbarSlice";
 import MyDrawer from "./MyDrawer";
+import { RootState } from "../store";
 
-const mapStateToProps = (state: CrowbarState) => ({ open: state.drawerOpen });
+const mapStateToProps = (state: RootState) => ({ open: state.crowbar.drawerOpen });
 
 const connector = connect(mapStateToProps, {
   addedFontAction,
@@ -36,7 +36,7 @@ const NavBar = (props: PropsFromRedux) => {
     props.changedDrawerState(true);
   };
   const onDrop = useCallback(
-    (acceptedFiles) => {
+    (acceptedFiles: File[]) => {
       const name = acceptedFiles[0].name.toLowerCase();
       if (
         !name.endsWith(".otf") &&
