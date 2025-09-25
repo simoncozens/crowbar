@@ -1,8 +1,9 @@
-import { makeStyles } from "@mui/styles";
+import { makeStyles } from "tss-react/mui";
 
 export const drawerWidth = 240;
 
-export const useStyles = makeStyles((theme) => ({
+// TODO jss-to-tss-react codemod: usages of this hook outside of this file will not be converted.
+export const useStyles = makeStyles()((theme) => ({
   root: {
     display: "flex",
   },
@@ -49,8 +50,6 @@ export const useStyles = makeStyles((theme) => ({
     display: "flex",
     alignItems: "center",
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
     justifyContent: "flex-start",
   },
   content: {

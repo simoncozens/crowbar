@@ -27,7 +27,7 @@ const connector = connect(mapStateToProps, {
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const NavBar = (props: PropsFromRedux) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const [shaking, setShaking] = React.useState(false);
   const { open } = props;
 

@@ -1,8 +1,8 @@
 import React from "react";
 import clsx from "clsx";
 
-import { makeStyles, ThemeProvider } from "@mui/styles";
-import { createTheme, StyledEngineProvider } from "@mui/material/styles";
+import { makeStyles } from 'tss-react/mui';
+import { createTheme, StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.css";
 import { connect, ConnectedProps } from "react-redux";
@@ -40,7 +40,7 @@ const theme = createTheme({
   },
 });
 
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles()((theme) => {
   return {
     root: {
       display: "flex",
@@ -51,23 +51,22 @@ const useStyles = makeStyles((theme) => {
       alignItems: "center",
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
-      ...theme.mixins.toolbar,
       justifyContent: "flex-start",
     },
     content: {
       flexGrow: 1,
       padding: theme.spacing(3),
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
+      // transition: theme.transitions.create("margin", {
+      //   easing: theme.transitions.easing.sharp,
+      //   duration: theme.transitions.duration.leavingScreen,
+      // }),
       marginRight: -drawerWidth,
     },
     contentShift: {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
+      // transition: theme.transitions.create("margin", {
+      //   easing: theme.transitions.easing.easeOut,
+      //   duration: theme.transitions.duration.enteringScreen,
+      // }),
       marginRight: 0,
     },
   };
@@ -75,7 +74,7 @@ const useStyles = makeStyles((theme) => {
 
 function Component(props: PropsFromRedux) {
   const { fontFaces, drawerOpen } = props;
-  const classes = useStyles();
+  const { classes } = useStyles();
   return (
     <div className={classes.root}>
       <style>{fontFaces.join("\n")}</style>
@@ -95,6 +94,7 @@ function Component(props: PropsFromRedux) {
 }
 
 const App = (props: PropsFromRedux) => {
+
   return (
     <StyledEngineProvider injectFirst>
     <ThemeProvider theme={theme}>

@@ -1,6 +1,6 @@
 import React from "react";
 import Input from "@mui/material/Input";
-import { makeStyles, createStyles} from "@mui/styles";
+import { makeStyles } from 'tss-react/mui';
 import { connect, ConnectedProps } from "react-redux";
 import { changedTextAction } from "../store/crowbarSlice";
 import { CrowbarFont } from "../opentype/CrowbarFont";
@@ -14,19 +14,17 @@ const mapStateToProps = (state: RootState) => {
 
 const connector = connect(mapStateToProps, { changedTextAction });
 type PropsFromRedux = ConnectedProps<typeof connector>;
-const useStyles = makeStyles(() =>
-  createStyles({
+const useStyles = makeStyles()((theme) =>
+  ({
     root: {
-      ...useTheme().typography.h2,
-      backgroundColor: useTheme().palette.background.paper,
-      padding: useTheme().spacing(1),
-    },
-  })
-);
+      backgroundColor: theme.palette.background.paper,
+      padding: theme.spacing(1),
+    }
+  }));
 
 const BigTextBox = (props: PropsFromRedux) => {
   const { font, changedTextAction: connectedChangedTextAction } = props;
-  const classes = useStyles();
+  const { classes } = useStyles();
   let restyle;
   if (font) {
     restyle = { fontFamily: `"${font.name}"` } as React.CSSProperties;
