@@ -13,11 +13,6 @@
   }
 }
 
-.MuiTableCell-body {
-    color: #fff;
-    min-width: 120px;
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -37,26 +32,28 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-.svgbox{
-  display:flex;
-    flex-flow: column;
+.svgbox {
+  display: flex;
+  flex-flow: column;
   width: 40%;
-  max-height : 200px;
+  max-height: 200px;
 }
+
 .svgwrapper {
-    width: 35%;
-    max-height : 200px;
-    background: #f5f5f5;
-    padding:5px;
-    position: fixed;
-    top: 80px;
-    left: 60%;
-    z-index: 5;
+  width: 35%;
+  max-height: 200px;
+  background: #f5f5f5;
+  padding: 5px;
+  position: fixed;
+  top: 80px;
+  left: 60%;
+  z-index: 5;
 
 }
 
@@ -69,31 +66,49 @@
     background-color: #f3f3f3;
   }
 }
-.MuiTableCell-body:hover .glyphadded {background-color: #e4fae4; }
-.MuiTableCell-body:hover .glyphmodified {background-color: #fafae4; }
 
-.glyphbox { display: table-cell;
-    border-right: 1px dotted black;
-    padding: 10px 10px;
-    text-align: center;
+.MuiTableCell-body:hover .glyphadded {
+  background-color: #e4fae4;
+}
+
+.MuiTableCell-body:hover .glyphmodified {
+  background-color: #fafae4;
+}
+
+.glyphbox {
+  display: table-cell;
+  border-right: 1px dotted black;
+  padding: 10px 10px;
+  text-align: center;
 }
 
 .markglyph {
-    background-size: 6px 6px !important;
-    background-image: linear-gradient(-45deg, transparent 46%, #555 49%, #555 51%, transparent 55%);
+  background-size: 6px 6px !important;
+  background-image: linear-gradient(-45deg, transparent 46%, #555 49%, #555 51%, transparent 55%);
 }
 
 @media (prefers-color-scheme: light) {
-  .glyphbox { background-color: #f3f3f3; }
+  .glyphbox {
+    background-color: #f3f3f3;
+  }
+
   .markglyph {
     background-image: linear-gradient(-45deg, transparent 46%, #ccc 49%, #ccc 51%, transparent 55%);
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  .MuiTableCell-body:hover .glyphadded {background-color: #424a42; }
-  .MuiTableCell-body:hover .glyphmodified {background-color: #4a4a42; }
-  .glypbox { border-right: 1px dotted white; }
+  .MuiTableCell-body:hover .glyphadded {
+    background-color: #424a42;
+  }
+
+  .MuiTableCell-body:hover .glyphmodified {
+    background-color: #4a4a42;
+  }
+
+  .glypbox {
+    border-right: 1px dotted white;
+  }
 }
 
 .shake {
@@ -102,15 +117,47 @@
 }
 
 @keyframes shake {
-  0% { transform: translate(1px, 0px); }
-  10% { transform: translate(-3px, 0px); }
-  20% { transform: translate(3px, 0px); }
-  30% { transform: translate(-3px, 0px); }
-  40% { transform: translate(3px, 0px); }
-  50% { transform: translate(-3px, 0px); }
-  60% { transform: translate(3px, 0px); }
-  70% { transform: translate(-3px, 0px); }
-  80% { transform: translate(3px, 0px); }
-  90% { transform: translate(1px, 0px); }
-  100% { transform: translate(0px, 0px); }
+  0% {
+    transform: translate(1px, 0px);
+  }
+
+  10% {
+    transform: translate(-3px, 0px);
+  }
+
+  20% {
+    transform: translate(3px, 0px);
+  }
+
+  30% {
+    transform: translate(-3px, 0px);
+  }
+
+  40% {
+    transform: translate(3px, 0px);
+  }
+
+  50% {
+    transform: translate(-3px, 0px);
+  }
+
+  60% {
+    transform: translate(3px, 0px);
+  }
+
+  70% {
+    transform: translate(-3px, 0px);
+  }
+
+  80% {
+    transform: translate(3px, 0px);
+  }
+
+  90% {
+    transform: translate(1px, 0px);
+  }
+
+  100% {
+    transform: translate(0px, 0px);
+  }
 }
