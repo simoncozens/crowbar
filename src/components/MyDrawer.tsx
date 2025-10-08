@@ -68,14 +68,13 @@ const connector = connect(mapStateToProps, {
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const MyDrawer = (props: PropsFromRedux) => {
-  const classes = useStyles();
-  const handleDrawerClose = () => {
+  const { classes } = useStyles();
+  const  handleDrawerClose = () => {
     props.changedDrawerState(false);
   };
   const handleVariationChange = (tag: string, value: number) => {
     const state = props.variations;
-    state[tag] = value;
-    props.changedVariations(state);
+    props.changedVariations({  ...state, [tag]: value });
   };
   const font: CrowbarFont = (props.fonts || [])[props.selectedFontIndex];
   const sortLanguages = (

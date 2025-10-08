@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 
 import { makeStyles } from 'tss-react/mui';
-import { createTheme, StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
+import { createTheme, styled, StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./App.css";
 import { connect, ConnectedProps } from "react-redux";
@@ -40,18 +40,15 @@ const theme = createTheme({
   },
 });
 
+const Offset = styled('div')(({ theme }) => theme.mixins.toolbar);
+
 const useStyles = makeStyles()((theme) => {
   return {
-    root: {
-      display: "flex",
-      alignContent: "center",
-    },
+    root: { },
     drawerHeader: {
       display: "flex",
       alignItems: "center",
       padding: theme.spacing(0, 1),
-      // necessary for content to be below app bar
-      justifyContent: "flex-start",
     },
     content: {
       flexGrow: 1,
@@ -79,16 +76,16 @@ function Component(props: PropsFromRedux) {
     <div className={classes.root}>
       <style>{fontFaces.join("\n")}</style>
       <CssBaseline />
+      <NavBar />
       <main
         className={clsx(classes.content, {
           [classes.contentShift]: drawerOpen,
         })}
       >
-        <div className={classes.drawerHeader} />
+      <Offset />
         <BigTextBox />
         <OutputArea />
       </main>
-      <NavBar />
     </div>
   );
 }
